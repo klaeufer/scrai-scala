@@ -1,9 +1,11 @@
 target/
 project/target/
 project/project/
+.bloop/
 .bsp/
 .metals/
 .scala-build/
 .DS_Store
 .vscode/
 __pycache__/
+project/metals.sbt

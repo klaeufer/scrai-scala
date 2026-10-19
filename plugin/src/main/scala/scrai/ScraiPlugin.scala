@@ -21,11 +21,16 @@ object ScraiPlugin extends AutoPlugin {
   /** Map a supported project Scala version to its runtime artifact, or None. */
   private[scrai] def runtimeModule(scalaVersion: String): Option[String] =
     if (scalaVersion.startsWith("3.3.")) Some("scrai-runtime_3.3")
+    else if (scalaVersion.startsWith("3.4.")) Some("scrai-runtime_3.4")
+    else if (scalaVersion.startsWith("3.5.")) Some("scrai-runtime_3.5")
+    else if (scalaVersion.startsWith("3.6.")) Some("scrai-runtime_3.6")
+    else if (scalaVersion.startsWith("3.7.")) Some("scrai-runtime_3.7")
+    else if (scalaVersion.startsWith("3.8.")) Some("scrai-runtime_3.8")
     else if (scalaVersion.startsWith("3.9.")) Some("scrai-runtime_3.9")
     else None
 
   private val supportedHint =
-    "scrai supports Scala 3.3.x and 3.9.x projects; set scalaVersion to one of those to use `console`."
+    "scrai supports Scala 3.3.x through 3.9.x projects; set scalaVersion to one of those to use `console`."
 
   override def projectSettings: Seq[Setting[_]] = Seq(
     libraryDependencies ++= runtimeModule(scalaVersion.value).toSeq.map { name =>

@@ -11,9 +11,9 @@ while leaving you in control of what runs.
 ## Quick start
 
 Requirements: JDK 17 or newer, a real interactive terminal, and a Groq API key.
-Supported combinations: **sbt 1.13.x and sbt 2.0.x**, each with **Scala 3.3.x or
-3.9.x** projects (scrai drives the compiler's REPL internals, so only these
-lines are supported; the dev build itself uses sbt 1.13.0).
+Supported combinations: **sbt 1.13.x and sbt 2.0.x**, each with **Scala 3.3.x
+through 3.9.x** projects (scrai drives the compiler's REPL internals and ships
+one runtime variant per Scala minor line; the dev build itself uses sbt 1.13.0).
 
 ### In your own project (sbt plugin)
 
@@ -139,15 +139,16 @@ inference and does not automatically fall back to another model/provider.
 ## Development and tests
 
 ```sh
-sbt runtime/test                             # unit tests on the Scala 3.9 line
-sbt "++3.3.7" "runtime/test"                 # same tests on the 3.3 line
+ sbt runtime/test                             # unit tests on the Scala 3.9 line
+ sbt "++3.3.7" "runtime/test"                 # same tests on the 3.3 line
+ sbt "++3.8.4" "runtime/test"                 # same tests on the 3.8 line
 python3 scripts/pty_smoke.py                 # PTY smoke via `sbt runtime/console`
 sbt publishAllLocal                         # publish all runtime + plugin variants for fixtures
 SCRAI_SMOKE_CWD=fixtures/sbt1 SCRAI_SMOKE_TASK=console python3 scripts/pty_smoke.py
 SCRAI_SMOKE_CWD=fixtures/sbt2 SCRAI_SMOKE_TASK=console python3 scripts/pty_smoke.py
 ```
 
-Layout: `runtime/` (the REPL widget, cross-built for Scala 3.3 and 3.9 with
+Layout: `runtime/` (the REPL widget, cross-built for Scala 3.3 through 3.9 with
 per-line source directories), `plugin/` (the sbt plugin, cross-built for sbt 1
 and sbt 2 via `crossSbtVersions` plus `sbt2-compat`), and `fixtures/`
 (standalone consumer builds on sbt 1 and sbt 2 used by CI to smoke-test the
@@ -166,7 +167,7 @@ Implementation:
 - `runtime/src/main/scala/scrai/Generation.scala`: prompt extraction, bounded context, asynchronous HTTP client.
 - `runtime/src/main/scala/scrai/AiTerminal.scala`: official terminal adaptation plus generate/restore widgets.
 - `runtime/src/main/scala/scrai/Main.scala`: `ReplDriver` subclass; evaluation and completion stay with Scala.
-- `runtime/src/main/scala-3.3/`, `scala-3.9/`: the per-line completion API shim.
+- `runtime/src/main/scala-3.3/` through `scala-3.9/`: the per-line completion API shims.
 - `plugin/src/main/scala/scrai/ScraiPlugin.scala`: resolves the matching `scrai-runtime` artifact and launches the child JVM on the project classpath.
 - `build.sbt`: multi-module build with the runtime and sbt-plugin cross-builds.
 

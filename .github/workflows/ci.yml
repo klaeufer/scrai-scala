@@ -26,8 +26,16 @@ jobs:
           java-version: "17"
           cache: sbt
       - uses: sbt/setup-sbt@v1
-      - name: Runtime tests on both Scala lines, plugin on both sbt lines
-        run: sbt "runtime/test" "plugin/compile" "++3.3.7" "runtime/test" "++3.8.4" "plugin/compile"
+      - name: Runtime tests on every Scala line, plugin on both sbt lines
+        run: >-
+          sbt "runtime/test" "plugin/compile"
+          "++3.3.7" "runtime/test"
+          "++3.4.3" "runtime/test"
+          "++3.5.2" "runtime/test"
+          "++3.6.4" "runtime/test"
+          "++3.7.4" "runtime/test"
+          "++3.8.4" "runtime/test"
+          "++3.8.4" "plugin/compile"
 
   smoke:
     name: PTY smoke test (${{ matrix.os }})
@@ -68,10 +76,14 @@ jobs:
             scala: "3.9.0"
           - fixture: sbt1
             scala: "3.3.7"
+          - fixture: sbt1
+            scala: "3.8.4"
           - fixture: sbt2
             scala: "3.9.0"
           - fixture: sbt2
             scala: "3.3.7"
+          - fixture: sbt2
+            scala: "3.8.4"
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
@@ -85,8 +97,11 @@ jobs:
       - name: Publish runtime and plugin locally
         run: >-
           sbt "runtime/publishLocal" "plugin/publishLocal"
-          "++3.3.7" "runtime/publishLocal"
-          "++3.8.4" "plugin/publishLocal"
+          "++3.4.3" "runtime/publishLocal"
+          "++3.5.2" "runtime/publishLocal"
+          "++3.6.4" "runtime/publishLocal"
+          "++3.7.4" "runtime/publishLocal"
+          "++3.8.4" "runtime/publishLocal"
       - name: Run pseudo-terminal smoke test through the sbt plugin
         env:
           SCRAI_SMOKE_CWD: fixtures/${{ matrix.fixture }}
