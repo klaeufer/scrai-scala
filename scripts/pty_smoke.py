@@ -2,6 +2,10 @@
 
 Run from the project directory: python3 scripts/pty_smoke.py
 Requires macOS/Linux, Python 3, Java, and sbt on PATH. No Python dependencies.
+
+Environment overrides:
+  SCRAI_SMOKE_TASK  sbt task to run (default: runtime/console)
+  SCRAI_SMOKE_CWD   directory for the sbt invocation (default: current dir)
 """
 
 import errno
@@ -50,14 +54,18 @@ class Handler(http.server.BaseHTTPRequestHandler):
 def main():
     server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), Handler)
     threading.Thread(target=server.serve_forever, daemon=True).start()
+    task = os.environ.get("SCRAI_SMOKE_TASK", "runtime/console")
+    cwd = os.environ.get("SCRAI_SMOKE_CWD") or None
     with tempfile.TemporaryDirectory(prefix="scrai-smoke-") as tmp:
         config = Path(tmp) / "scrai.ini"
         config.write_text(f"[scrai]\nbase_url = http://127.0.0.1:{server.server_port}/v1\n")
         pid, fd = pty.fork()
         if pid == 0:
             fcntl.ioctl(0, termios.TIOCSWINSZ, struct.pack("HHHH", 40, 120, 0, 0))
+            if cwd:
+                os.chdir(cwd)
             os.environ.update(SCRAI_CONFIG=str(config), GROQ_API_KEY="test-key", TERM="xterm-256color")
-            os.execvp("sbt", ["sbt", "-batch", "console"])
+            os.execvp("sbt", ["sbt", "-batch", task])
         transcript = bytearray()
 
         def read_until(needle, start=0, timeout=90):

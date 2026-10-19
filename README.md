@@ -10,15 +10,43 @@ while leaving you in control of what runs.
 
 ## Quick start
 
-Requirements: JDK 17 or newer, sbt, a real interactive terminal, and a Groq API key.
-The project pins Scala 3.9.0 LTS and sbt 1.13.0 because it uses compiler REPL internals.
+Requirements: JDK 17 or newer, a real interactive terminal, and a Groq API key.
+Supported combinations: **sbt 1.13.x and sbt 2.0.x**, each with **Scala 3.3.x or
+3.9.x** projects (scrai drives the compiler's REPL internals, so only these
+lines are supported; the dev build itself uses sbt 1.13.0).
 
-In fish:
+### In your own project (sbt plugin)
+
+Until the plugin is published to Maven Central, publish every supported variant
+locally from a clone:
+
+```sh
+sbt publishAllLocal
+```
+
+Then add to `project/plugins.sbt`:
+
+```scala
+addSbtPlugin("edu.luc.scrai" % "sbt-scrai" % "0.1.0-SNAPSHOT")
+```
+
+and enable it in `build.sbt`:
+
+```scala
+import scrai.ScraiPlugin
+
+lazy val root = project.in(file(".")).enablePlugins(ScraiPlugin)
+```
+
+`sbt console` now starts the AI REPL, with your project's classpath available
+for evaluation exactly as in the stock REPL.
+
+### In this repository (development)
 
 ```fish
 cd /Users/laufer/Work/teaching/cs371/scrai-scala
 set -gx GROQ_API_KEY your-key
-sbt console
+sbt runtime/console
 ```
 
 In bash/zsh, use `export GROQ_API_KEY=your-key` instead. Set the key before
@@ -97,9 +125,9 @@ inference and does not automatically fall back to another model/provider.
   execute it. There is no sandbox, automatic evaluation, or automatic repair.
 - HTTPS is required except for local servers. API keys are read from environment
   variables; provider error bodies are not printed.
-- This is a project-local launcher, not an installable sbt plugin. It overrides
-  `Compile / console` only. It does not support sbt console `initialCommands`,
-  `cleanupCommands`, or arbitrary console-specific compiler options yet.
+- The sbt plugin overrides `Compile / console` when `enablePlugins(ScraiPlugin)`
+  is set. It does not support sbt console `initialCommands`, `cleanupCommands`,
+  or arbitrary console-specific compiler options yet.
 - The input parser/highlighter is adapted from the official REPL. Completion
   candidates use the compiler, but the stock REPL's extra signature display on
   an exact completion match is not currently reproduced.
@@ -111,22 +139,35 @@ inference and does not automatically fall back to another model/provider.
 ## Development and tests
 
 ```sh
-sbt test
-python3 scripts/pty_smoke.py
+sbt runtime/test                             # unit tests on the Scala 3.9 line
+sbt "++3.3.7" "runtime/test"                 # same tests on the 3.3 line
+python3 scripts/pty_smoke.py                 # PTY smoke via `sbt runtime/console`
+sbt publishAllLocal                         # publish all runtime + plugin variants for fixtures
+SCRAI_SMOKE_CWD=fixtures/sbt1 SCRAI_SMOKE_TASK=console python3 scripts/pty_smoke.py
+SCRAI_SMOKE_CWD=fixtures/sbt2 SCRAI_SMOKE_TASK=console python3 scripts/pty_smoke.py
 ```
+
+Layout: `runtime/` (the REPL widget, cross-built for Scala 3.3 and 3.9 with
+per-line source directories), `plugin/` (the sbt plugin, cross-built for sbt 1
+and sbt 2 via `crossSbtVersions` plus `sbt2-compat`), and `fixtures/`
+(standalone consumer builds on sbt 1 and sbt 2 used by CI to smoke-test the
+plugin through `publishLocal`).
 
 Unit tests use a local HTTP server; the pseudo-terminal smoke test invokes
 `sbt console` with a fake model and exercises real terminal editing. Neither
 requires a Groq key or sends requests to Groq. The smoke test requires macOS or
 Linux and Python 3, and writes its terminal transcript to
-`/tmp/scrai-pty-transcript.log`.
+`/tmp/scrai-pty-transcript.log`. `SCRAI_SMOKE_CWD` and `SCRAI_SMOKE_TASK` point
+it at a fixture build instead of this repository.
 
 Implementation:
 
-- `Config.scala`: XDG config, profiles, validation.
-- `Generation.scala`: prompt extraction, bounded context, asynchronous HTTP client.
-- `AiTerminal.scala`: official terminal adaptation plus generate/restore widgets.
-- `Main.scala`: `ReplDriver` subclass; evaluation and completion stay with Scala.
-- `build.sbt`: project-local `sbt console` task and inherited-terminal launcher.
+- `runtime/src/main/scala/scrai/Config.scala`: XDG config, profiles, validation.
+- `runtime/src/main/scala/scrai/Generation.scala`: prompt extraction, bounded context, asynchronous HTTP client.
+- `runtime/src/main/scala/scrai/AiTerminal.scala`: official terminal adaptation plus generate/restore widgets.
+- `runtime/src/main/scala/scrai/Main.scala`: `ReplDriver` subclass; evaluation and completion stay with Scala.
+- `runtime/src/main/scala-3.3/`, `scala-3.9/`: the per-line completion API shim.
+- `plugin/src/main/scala/scrai/ScraiPlugin.scala`: resolves the matching `scrai-runtime` artifact and launches the child JVM on the project classpath.
+- `build.sbt`: multi-module build with the runtime and sbt-plugin cross-builds.
 
 See `THIRD-PARTY-NOTICES.md` and `LICENSE-Scala` for the adapted Scala source.

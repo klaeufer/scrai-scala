@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   test:
-    name: Unit tests (Ubuntu)
+    name: Unit tests and cross-build (Ubuntu)
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -26,8 +26,8 @@ jobs:
           java-version: "17"
           cache: sbt
       - uses: sbt/setup-sbt@v1
-      - name: Run unit tests
-        run: sbt test
+      - name: Runtime tests on both Scala lines, plugin on both sbt lines
+        run: sbt "runtime/test" "plugin/compile" "++3.3.7" "runtime/test" "++3.8.4" "plugin/compile"
 
   smoke:
     name: PTY smoke test (${{ matrix.os }})
@@ -46,7 +46,7 @@ jobs:
           java-version: "17"
           cache: sbt
       - uses: sbt/setup-sbt@v1
-      - name: Run pseudo-terminal smoke test
+      - name: Run pseudo-terminal smoke test (project console)
         run: python3 scripts/pty_smoke.py
       - name: Upload terminal transcript
         if: always()
@@ -56,3 +56,48 @@ jobs:
           path: /tmp/scrai-pty-transcript.log
           if-no-files-found: ignore
           retention-days: 7
+
+  fixture:
+    name: Plugin fixture (${{ matrix.fixture }}, Scala ${{ matrix.scala }})
+    needs: test
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - fixture: sbt1
+            scala: "3.9.0"
+          - fixture: sbt1
+            scala: "3.3.7"
+          - fixture: sbt2
+            scala: "3.9.0"
+          - fixture: sbt2
+            scala: "3.3.7"
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: sbt
+      - uses: sbt/setup-sbt@v1
+      - name: Publish runtime and plugin locally
+        run: >-
+          sbt "runtime/publishLocal" "plugin/publishLocal"
+          "++3.3.7" "runtime/publishLocal"
+          "++3.8.4" "plugin/publishLocal"
+      - name: Run pseudo-terminal smoke test through the sbt plugin
+        env:
+          SCRAI_SMOKE_CWD: fixtures/${{ matrix.fixture }}
+          SCRAI_TEST_SCALA_VERSION: ${{ matrix.scala }}
+        run: SCRAI_SMOKE_TASK=console python3 scripts/pty_smoke.py
+      - name: Upload terminal transcript
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: pty-transcript-fixture-${{ matrix.fixture }}-${{ matrix.scala }}
+          path: /tmp/scrai-pty-transcript.log
+          if-no-files-found: ignore
+          retention-days: 7
+

@@ -1,6 +1,6 @@
 # Third-party source
 
-`src/main/scala/scrai/AiTerminal.scala` is adapted from the Scala 3.3.7
+`runtime/src/main/scala/scrai/AiTerminal.scala` is adapted from the Scala 3.3.7
 compiler's `dotty/tools/repl/JLineTerminal.scala`:
 https://github.com/scala/scala3/blob/3.3.7/compiler/src/dotty/tools/repl/JLineTerminal.scala
 

@@ -5,8 +5,14 @@ import dotty.tools.repl.*
 import org.jline.reader.*
 import scala.jdk.CollectionConverters.*
 
-final class AiRepl(config: Config, generator: Generator, classpath: String)
+abstract class AiRepl(config: Config, generator: Generator, classpath: String)
     extends ReplDriver(Array("-classpath", classpath, "-color:never")):
+
+  /** Completion labels from the compiler. Version-specific: see the
+   *  scala-3.3 / scala-3.9 source directories for the implementations.
+   */
+  protected def completionLabels(cursor: Int, line: String, state: State): Seq[String]
+
   override def runUntilQuit(using start: State = initialState)(): State =
     val session = new SessionContext(config.contextChars)
     val terminal = new AiTerminal(config, generator, session)
@@ -19,8 +25,8 @@ final class AiRepl(config: Config, generator: Generator, classpath: String)
       while !done do
         given Context = state.context
         val completer: Completer = (_, line, candidates) =>
-          val matches = completions(line.cursor(), line.line(), state)
-          candidates.addAll(matches.map(_.label).distinct.map { label =>
+          val labels = completionLabels(line.cursor(), line.line(), state)
+          candidates.addAll(labels.distinct.map { label =>
             new Candidate(label, label.stripPrefix("`").stripSuffix("`"), null, null, null, null, false)
           }.asJava)
         try
@@ -45,5 +51,10 @@ final class AiRepl(config: Config, generator: Generator, classpath: String)
 object Main:
   def main(args: Array[String]): Unit =
     val config = Config.load()
-    val repl = new AiRepl(config, new GroqGenerator(config), System.getProperty("java.class.path"))
+    // The plugin launcher passes the user's project classpath explicitly so
+    // evaluation sees exactly what a stock `sbt console` would see; without it
+    // (project-local console) the child JVM's classpath is the REPL classpath.
+    val classpath =
+      Option(System.getProperty("scrai.repl.classpath")).getOrElse(System.getProperty("java.class.path"))
+    val repl = new VersionedAiRepl(config, new GroqGenerator(config), classpath)
     repl.runUntilQuit()
