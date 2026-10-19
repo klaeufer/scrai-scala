@@ -171,3 +171,6 @@ Implementation:
 - `build.sbt`: multi-module build with the runtime and sbt-plugin cross-builds.
 
 See `THIRD-PARTY-NOTICES.md` and `LICENSE-Scala` for the adapted Scala source.
+
+The development history of this project, including the decisions behind the
+plugin conversion, is recorded in [`doc/ai/transcript.md`](doc/ai/transcript.md).
