@@ -35,6 +35,7 @@ push was made only after the Owner asked for it.
 | `c99e845` | Add CI: unit tests on Ubuntu, PTY smoke test on Ubuntu and macOS | 2 — continuous integration |
 | `1ff7025` | CI: bump actions to Node 24-compatible majors | 2 — CI maintenance |
 | `71cf388` | Turn scrai into an sbt plugin with runtime/plugin cross-builds | 3 — the plugin conversion |
+| `24c4405` | Document the AI-assisted development transcript in `doc/ai` | 4 — this documentation |
 
 ### The starting point (session 1)
 
@@ -590,7 +591,36 @@ omission is visible rather than implicit:
 
 ---
 
-## 4. What carried over from the original design
+## 4. Session 4 — documenting the collaboration (`24c4405`)
+
+**Request.** Write down how the project was actually built: the requests, the
+decisions, the failures and their fixes, and the validation — and commit it.
+
+**Approach.** Rather than dumping the chat log, the transcript was
+*reconstructed* from artifacts the sessions left behind: the git history for
+the commit map, the `/tmp/scrai-*.log` files for the verbatim compiler and
+resolver errors, and the committed diffs for the design decisions. The
+provenance statement in `doc/ai/README.md` says so explicitly, so a reader
+knows the document is a curated reconstruction rather than a raw capture.
+
+**The same verification discipline applied to the prose.** Every factual
+claim was checked against the repository before it was written — the artifact
+coordinates, the `sbt2-compat` version, the two per-line shim sizes, the
+number of unit tests (nine, confirmed by `Passed: Total 9, Failed 0`), and
+the CI job list. Where a session's coverage was genuinely incomplete, the
+transcript says so: sbt 2 + Scala 3.3.7 was covered by CI but never by a
+local run, and the real Groq endpoint was never exercised.
+
+**Two small corrections came out of writing the document.** Reviewing the
+README and the third-party notices against the actual tree showed that
+`THIRD-PARTY-NOTICES.md` listed only the adapted Scala source, not the binary
+dependencies the build now pulls in — `sbt2-compat`, `ujson`, `munit`, and
+the Scala 3 compiler and REPL. A dependency section was added, and the README
+gained a link to the transcript.
+
+---
+
+## 5. What carried over from the original design
 
 The conversion changed the packaging, not the product. The properties that
 session 1 established survived session 3 intact, and the plugin conversion
@@ -607,7 +637,7 @@ was mostly the business of making them work across more versions:
 
 ---
 
-## 5. Summary of the collaboration
+## 6. Summary of the collaboration
 
 **What the agent did well.**
 
