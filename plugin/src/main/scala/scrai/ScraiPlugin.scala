@@ -27,10 +27,11 @@ object ScraiPlugin extends AutoPlugin {
     else if (scalaVersion.startsWith("3.7.")) Some("scrai-runtime_3.7")
     else if (scalaVersion.startsWith("3.8.")) Some("scrai-runtime_3.8")
     else if (scalaVersion.startsWith("3.9.")) Some("scrai-runtime_3.9")
+    else if (scalaVersion.startsWith("3.10.")) Some("scrai-runtime_3.10")
     else None
 
   private val supportedHint =
-    "scrai supports Scala 3.3.x through 3.9.x projects; set scalaVersion to one of those to use `console`."
+    "scrai supports Scala 3.3.x through 3.10.x projects; set scalaVersion to one of those to use `console`."
 
   override def projectSettings: Seq[Setting[_]] = Seq(
     libraryDependencies ++= runtimeModule(scalaVersion.value).toSeq.map { name =>

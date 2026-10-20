@@ -35,6 +35,8 @@ jobs:
           "++3.6.4" "runtime/test"
           "++3.7.4" "runtime/test"
           "++3.8.4" "runtime/test"
+          "++3.9.0" "runtime/test"
+          "++3.10.0" "runtime/test"
           "++3.8.4" "plugin/compile"
 
   smoke:
@@ -77,13 +79,37 @@ jobs:
           - fixture: sbt1
             scala: "3.3.7"
           - fixture: sbt1
+            scala: "3.4.3"
+          - fixture: sbt1
+            scala: "3.5.2"
+          - fixture: sbt1
+            scala: "3.6.4"
+          - fixture: sbt1
+            scala: "3.7.4"
+          - fixture: sbt1
             scala: "3.8.4"
+          - fixture: sbt1
+            scala: "3.9.0"
+          - fixture: sbt1
+            scala: "3.10.0"
           - fixture: sbt2
             scala: "3.9.0"
           - fixture: sbt2
             scala: "3.3.7"
           - fixture: sbt2
+            scala: "3.4.3"
+          - fixture: sbt2
+            scala: "3.5.2"
+          - fixture: sbt2
+            scala: "3.6.4"
+          - fixture: sbt2
+            scala: "3.7.4"
+          - fixture: sbt2
             scala: "3.8.4"
+          - fixture: sbt2
+            scala: "3.9.0"
+          - fixture: sbt2
+            scala: "3.10.0"
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
@@ -94,14 +120,8 @@ jobs:
           java-version: "17"
           cache: sbt
       - uses: sbt/setup-sbt@v1
-      - name: Publish runtime and plugin locally
-        run: >-
-          sbt "runtime/publishLocal" "plugin/publishLocal"
-          "++3.4.3" "runtime/publishLocal"
-          "++3.5.2" "runtime/publishLocal"
-          "++3.6.4" "runtime/publishLocal"
-          "++3.7.4" "runtime/publishLocal"
-          "++3.8.4" "runtime/publishLocal"
+      - name: Publish every runtime and plugin variant locally
+        run: sbt publishAllLocal
       - name: Run pseudo-terminal smoke test through the sbt plugin
         env:
           SCRAI_SMOKE_CWD: fixtures/${{ matrix.fixture }}
