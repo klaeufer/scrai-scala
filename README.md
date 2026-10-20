@@ -12,7 +12,7 @@
 
 **scrai** (pronounced “scry”) blends **Scala**, **REPL**, and **AI**—with a nod
 to *scrying*, or seeking insight. 
-It is a lightweight AI input widget for the **native Scala 3 REPL** (standalone CLI) and **sbt console plugin** (sbt-console-ai)
+It is a lightweight AI input widget for the **native Scala 3 REPL** (standalone CLI) and **sbt console plugin** (sbt-console-ai).
 
 Type a `//` request, press **Ctrl-G**, review the generated Scala, then press
 Enter to evaluate it. Generation never submits the code automatically, so you're in control of what runs.
