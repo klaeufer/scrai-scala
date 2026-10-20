@@ -139,14 +139,20 @@ inference and does not automatically fall back to another model/provider.
 ## Development and tests
 
 ```sh
- sbt runtime/test                             # unit tests on the Scala 3.9 line
- sbt "++3.3.7" "runtime/test"                 # same tests on the 3.3 line
- sbt "++3.8.4" "runtime/test"                 # same tests on the 3.8 line
+ sbt runtime/test                              # unit tests on the default 3.9 line
+ sbt "++3.3.7" "runtime/test"                 # test the 3.3 line
+ sbt "++3.10.0" "runtime/test"                # test the 3.10 line
 python3 scripts/pty_smoke.py                 # PTY smoke via `sbt runtime/console`
-sbt publishAllLocal                         # publish all runtime + plugin variants for fixtures
+sbt publishAllLocal                           # publish all runtime + plugin variants
 SCRAI_SMOKE_CWD=fixtures/sbt1 SCRAI_SMOKE_TASK=console python3 scripts/pty_smoke.py
 SCRAI_SMOKE_CWD=fixtures/sbt2 SCRAI_SMOKE_TASK=console python3 scripts/pty_smoke.py
 ```
+
+The CI cross-build runs the runtime unit suite on every supported line:
+`3.3.7`, `3.4.3`, `3.5.2`, `3.6.4`, `3.7.4`, `3.8.4`, `3.9.0`, and
+`3.10.0`. The fixture matrix exercises all of those Scala lines with both sbt 1
+and sbt 2. `publishAllLocal` publishes the eight runtime artifacts and both sbt
+plugin variants required by those fixtures.
 
 Layout: `runtime/` (the REPL widget, cross-built for Scala 3.3 through 3.10 with
 per-line source directories), `plugin/` (the sbt plugin, cross-built for sbt 1
@@ -159,7 +165,10 @@ Unit tests use a local HTTP server; the pseudo-terminal smoke test invokes
 requires a Groq key or sends requests to Groq. The smoke test requires macOS or
 Linux and Python 3, and writes its terminal transcript to
 `/tmp/scrai-pty-transcript.log`. `SCRAI_SMOKE_CWD` and `SCRAI_SMOKE_TASK` point
-it at a fixture build instead of this repository.
+it at a fixture build instead of this repository. The runtime suite and local
+publication workflow have been validated across the complete Scala 3.3–3.10
+matrix; GitHub Actions is configured to repeat that validation on pushes and
+pull requests.
 
 Implementation:
 

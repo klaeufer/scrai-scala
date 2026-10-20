@@ -36,6 +36,8 @@ push was made only after the Owner asked for it.
 | `1ff7025` | CI: bump actions to Node 24-compatible majors | 2 — CI maintenance |
 | `71cf388` | Turn scrai into an sbt plugin with runtime/plugin cross-builds | 3 — the plugin conversion |
 | `24c4405` | Document the AI-assisted development transcript in `doc/ai` | 4 — this documentation |
+| `e3562b8` | Enhance CI configuration for Scala versions 3.3 to 3.9, add support for Scala 3.4 to 3.8, and update README for compatibility details | 5 — broadening Scala 3 support and repairing CI |
+| `de08b6e` | Add Scala 3.10 runtime support | 5 — broadening Scala 3 support and repairing CI |
 
 ### The starting point (session 1)
 
@@ -620,7 +622,81 @@ gained a link to the transcript.
 
 ---
 
-## 5. What carried over from the original design
+## 5. Session 5 — broadening Scala 3 support and repairing CI (`e3562b8`, `de08b6e`)
+
+### 5.1 The request
+
+The Owner decided not to support Scala 2 as a project language version. The
+target became Scala 3.3.x through 3.10.x, retaining the Scala 2.12 build only
+where it is required by sbt 1's plugin ecosystem. The immediate task was to
+review a failing GitHub Actions run, fix its cause, add Scala 3.10 support, and
+validate the complete matrix.
+
+### 5.2 What GitHub Actions showed
+
+The failing run was GitHub Actions run `39341395461` for commit `e3562b8`, on
+October 19, 2026. The runtime cross-build and standalone PTY jobs passed, as did
+some fixture jobs. The failing fixture jobs reported unresolved snapshot
+artifacts:
+
+- sbt 1 + Scala 3.3.7 could not resolve `edu.luc.scrai:scrai-runtime_3.3`.
+- sbt 2 fixtures could not resolve `edu.luc.scrai:sbt-scrai_sbt2_3`.
+
+The failure was not a Scala REPL incompatibility. The fixture job's publication
+commands had been edited into an incomplete list: the 3.3 runtime and sbt 2
+plugin were no longer published. The build also had a related omission where
+the 3.8 runtime was not published in the `publishAllLocal` sequence.
+
+### 5.3 The compatibility expansion
+
+The runtime matrix was expanded to one artifact per Scala minor line:
+
+| Scala line | Runtime compiler used | Runtime module |
+|---|---:|---|
+| 3.3.x | 3.3.7 | `scrai-runtime_3.3` |
+| 3.4.x | 3.4.3 | `scrai-runtime_3.4` |
+| 3.5.x | 3.5.2 | `scrai-runtime_3.5` |
+| 3.6.x | 3.6.4 | `scrai-runtime_3.6` |
+| 3.7.x | 3.7.4 | `scrai-runtime_3.7` |
+| 3.8.x | 3.8.4 | `scrai-runtime_3.8` |
+| 3.9.x | 3.9.0 | `scrai-runtime_3.9` |
+| 3.10.x | 3.10.0 | `scrai-runtime_3.10` |
+
+Scala 3.10.0 was confirmed available from Maven Central before adding the
+runtime adapter. Its completion API matched the labeled-candidate shape used by
+the 3.5–3.9 adapters, so the new source seam is a small
+`runtime/src/main/scala-3.10/` implementation. The plugin maps `3.10.*` project
+versions to `scrai-runtime_3.10` and rejects versions outside the Scala 3.3–3.10
+range.
+
+### 5.4 Publication and CI repair
+
+`publishAllLocal` is now the single publication command used by the fixture
+workflow. It publishes all eight runtime variants, the sbt 1 plugin, and the
+sbt 2 plugin. The fixture matrix covers all eight Scala lines under both sbt
+lines, for sixteen consumer jobs. The standalone runtime tests also run on all
+eight lines, while plugin compilation remains checked for sbt 1 and sbt 2.
+
+### 5.5 Validation and the pushed result
+
+The complete runtime test sequence passed locally, including nine tests per
+Scala line. Scala 3.10.0 compiled and passed the same suite. `sbt publishAllLocal`
+produced all eight runtime artifacts and both plugin artifacts in the local Ivy
+repository. YAML parsing and `git diff --check` passed as well.
+
+The changes were committed and pushed to `main` as:
+
+```text
+de08b6e Add Scala 3.10 runtime support
+```
+
+At the time of writing, the local branch was synchronized with `origin/main`.
+The new GitHub run was not asserted from the local session; the workflow is
+configured to repeat the complete matrix on the next push or pull request.
+
+---
+
+## 6. What carried over from the original design
 
 The conversion changed the packaging, not the product. The properties that
 session 1 established survived session 3 intact, and the plugin conversion
@@ -637,7 +713,7 @@ was mostly the business of making them work across more versions:
 
 ---
 
-## 6. Summary of the collaboration
+## 7. Summary of the collaboration
 
 **What the agent did well.**
 

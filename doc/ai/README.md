@@ -2,8 +2,9 @@
 
 This directory documents how **scrai-scala** was built with the assistance of
 an AI coding agent (Cline, working with the repository owner through a chat
-interface in VS Code). The sessions ran 19–20 October 2026 and produced every
-commit in the repository's history except this documentation itself.
+interface in VS Code). The sessions ran 19–20 October 2026 and produced the implementation and CI
+changes documented here. The documentation commits are called out separately
+in the transcript's commit map.
 
 - [`transcript.md`](transcript.md) — the chronological transcript of the
   development sessions: what was requested, what was decided, what broke, and
