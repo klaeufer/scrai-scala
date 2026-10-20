@@ -1,5 +1,14 @@
 # scrai-scala
 
+[![CI](https://github.com/klaeufer/scrai-scala/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/klaeufer/scrai-scala/actions/workflows/ci.yml)
+[![Standalone release](https://github.com/klaeufer/scrai-scala/actions/workflows/release.yml/badge.svg)](https://github.com/klaeufer/scrai-scala/actions/workflows/release.yml)
+[![Scala 3.3–3.10](https://img.shields.io/badge/Scala-3.3%E2%80%933.10-FDCB00?logo=scala&logoColor=white)](#quick-start)
+[![sbt 1.13 / 2.0](https://img.shields.io/badge/sbt-1.13%20%2F%202.0-FF6F00?logo=sbt&logoColor=white)](#quick-start)
+[![Standalone Scala 3.9.0](https://img.shields.io/badge/standalone-Scala%203.9.0-FDCB00?logo=scala&logoColor=white)](#standalone-quick-install)
+[![Java 17+](https://img.shields.io/badge/Java-17%2B-437291?logo=openjdk&logoColor=white)](#quick-start)
+[![macOS and Linux](https://img.shields.io/badge/platform-macOS%20%7C%20Linux-555555?logo=linux&logoColor=white)](#development-and-tests)
+[![AI development transcript](https://img.shields.io/badge/AI%20development-transcript-6f42c1)](doc/ai/transcript.md)
+
 A teaching-oriented AI input widget for the **official Scala 3 REPL**.
 Type a `//` request, press **Ctrl-G**, review the generated Scala, then press
 Enter to evaluate it. Generation never submits the code automatically.
@@ -161,10 +170,10 @@ inference and does not automatically fall back to another model/provider.
 ## Development and tests
 
 ```sh
- sbt runtime/test                              # unit tests on the default 3.9 line
- sbt "++3.3.7" "runtime/test"                 # test the 3.3 line
- sbt "++3.10.0" "runtime/test"                # test the 3.10 line
-python3 scripts/pty_smoke.py                 # PTY smoke via `sbt runtime/console`
+sbt runtime/test                               # unit tests on the default 3.9 line
+sbt "++3.3.7" "runtime/test"                  # test the 3.3 line
+sbt "++3.10.0" "runtime/test"                 # test the 3.10 line
+python3 scripts/pty_smoke.py                  # PTY smoke via `sbt runtime/console`
 sbt publishAllLocal                           # publish all runtime + plugin variants
 SCRAI_SMOKE_CWD=fixtures/sbt1 SCRAI_SMOKE_TASK=console python3 scripts/pty_smoke.py
 SCRAI_SMOKE_CWD=fixtures/sbt2 SCRAI_SMOKE_TASK=console python3 scripts/pty_smoke.py
