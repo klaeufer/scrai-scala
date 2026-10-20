@@ -1,1 +1,1 @@
-addSbtPlugin("edu.luc.cs" % "sbt-console-ai" % "0.1.0-SNAPSHOT")
+addSbtPlugin("edu.luc.cs" % "sbt-console-ai" % "0.1.3-SNAPSHOT")

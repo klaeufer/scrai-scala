@@ -1,7 +1,7 @@
 import scala.sys.process.*
 
 ThisBuild / organization := "edu.luc.cs"
-ThisBuild / version := sys.props.getOrElse("scrai.version", "0.1.0-SNAPSHOT")
+ThisBuild / version := sys.props.getOrElse("scrai.version", "0.1.3-SNAPSHOT")
 
 // Supported lines. Keep runtime module names in sync with ScraiPlugin.runtimeModule.
 val scala33 = "3.3.7"
