@@ -18,6 +18,9 @@ final case class Config(
 )
 
 object Config:
+  def apiKeyConfigured(config: Config, env: Map[String, String] = sys.env): Boolean =
+    env.get(config.apiKeyEnv).exists(_.nonEmpty)
+
   def load(env: Map[String, String] = sys.env): Config =
     val path = env.get("SCRAI_CONFIG").map(Path.of(_)).getOrElse {
       Path.of(env.getOrElse("XDG_CONFIG_HOME", System.getProperty("user.home") + "/.config"), "scrai.ini")

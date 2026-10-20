@@ -39,7 +39,7 @@ final class GroqGenerator(config: Config, env: Map[String, String] = sys.env) ex
 
   def generate(prompt: String, context: String): CompletableFuture[String] =
     val key = env.get(config.apiKeyEnv).filter(_.nonEmpty).getOrElse {
-      throw IllegalArgumentException(s"Set ${config.apiKeyEnv} before starting sbt; normal Scala evaluation still works.")
+      throw IllegalArgumentException(s"Set ${config.apiKeyEnv} before launching scrai; normal Scala evaluation still works.")
     }
     val scalaV = dotty.tools.dotc.config.Properties.versionNumberString
     val system = s"""Generate Scala $scalaV code for the official Scala REPL. Return ONLY Scala code, without Markdown,

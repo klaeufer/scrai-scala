@@ -106,3 +106,9 @@ class CoreSuite extends munit.FunSuite:
   test("missing credentials fail locally") {
     intercept[IllegalArgumentException](new GroqGenerator(Config(), Map.empty).generate("help", ""))
   }
+
+  test("credential availability is detected at startup") {
+    assert(!Config.apiKeyConfigured(Config(), Map.empty))
+    assert(!Config.apiKeyConfigured(Config(), Map("GROQ_API_KEY" -> "")))
+    assert(Config.apiKeyConfigured(Config(), Map("GROQ_API_KEY" -> "test-key")))
+  }

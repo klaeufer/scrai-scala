@@ -59,7 +59,7 @@ lazy val root = project.in(file("."))
           |  echo "scrai requires Java 17 or newer on PATH." >&2
           |  exit 1
           |fi
-          |exec java -cp "$SCRIPT_DIR/../lib/*" edu.luc.cs.scrai.Main "$@"
+          |exec java --enable-native-access=ALL-UNNAMED -cp "$SCRIPT_DIR/../lib/*" edu.luc.cs.scrai.Main "$@"
           |""".stripMargin)
       launcher.setExecutable(true)
       Seq("LICENSE-Scala", "THIRD-PARTY-NOTICES.md").foreach { name =>
@@ -114,6 +114,7 @@ lazy val runtime = project.in(file("runtime"))
     Compile / unmanagedSourceDirectories += (Compile / sourceDirectory).value /
       ("scala-" + scalaVersion.value.split('.').take(2).mkString(".")),
     Compile / run / fork := true,
+    Compile / run / javaOptions += "--enable-native-access=ALL-UNNAMED",
     Compile / run / connectInput := true,
     Compile / console := {
       val cp = (Compile / fullClasspath).value.files.mkString(java.io.File.pathSeparator)
@@ -121,7 +122,13 @@ lazy val runtime = project.in(file("runtime"))
       // A real inherited TTY is essential: sbt's Fork helper pipes stdin.
       // sbt's own launcher can also redirect its stdin, so use the controlling
       // terminal explicitly on Unix instead of inheriting that redirected fd.
-      val process = new java.lang.ProcessBuilder(javaExecutable.getAbsolutePath, "-cp", cp, "edu.luc.cs.scrai.Main")
+      val process = new java.lang.ProcessBuilder(
+        javaExecutable.getAbsolutePath,
+        "--enable-native-access=ALL-UNNAMED",
+        "-cp",
+        cp,
+        "edu.luc.cs.scrai.Main"
+      )
         .directory(baseDirectory.value).inheritIO()
       if (!sys.props("os.name").toLowerCase.contains("windows")) {
         val tty = file("/dev/tty")

@@ -49,6 +49,7 @@ object ScraiPlugin extends AutoPlugin {
       // terminal explicitly on Unix instead of inheriting that redirected fd.
       val process = new ProcessBuilder(
         javaExecutable.getAbsolutePath,
+        "--enable-native-access=ALL-UNNAMED",
         "-cp",
         fullCp,
         "-Dscrai.repl.classpath=" + evalCp,

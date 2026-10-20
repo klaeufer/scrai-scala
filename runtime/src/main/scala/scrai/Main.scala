@@ -19,6 +19,8 @@ abstract class AiRepl(config: Config, generator: Generator, classpath: String)
     println(s"Scala AI REPL — ${config.model}")
     println(s"${config.hotkey}: generate from // comments; ${config.restoreHotkey}: restore prompt; :quit: exit")
     println(s"Generation sends your prompt and up to ${config.contextChars} session characters to ${config.baseUrl}.")
+    if !Config.apiKeyConfigured(config) then
+      println(s"[scrai] Set ${config.apiKeyEnv} before launching scrai; normal Scala evaluation still works.")
     var state = start
     var done = false
     try runBody {

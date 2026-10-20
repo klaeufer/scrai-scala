@@ -93,7 +93,7 @@ export GROQ_API_KEY=your-key
 sbt runtime/console
 ```
 
-Set the key before starting sbt; don't put it into Scala input, history, or the configuration file.
+Set the key before launching `scrai`; don't put it into Scala input, history, or the configuration file.
 Missing credentials do not prevent normal Scala evaluation.
 
 For example,
