@@ -3,8 +3,12 @@ set -eu
 
 REPOSITORY="klaeufer/scrai-scala"
 ASSET="scrai-standalone-scala3.9.zip"
-RELEASE_URL="https://github.com/$REPOSITORY/releases/latest/download"
-VERSION="3.9.0"
+# The release workflow replaces these placeholders in the installer asset.
+# The source copy remains useful for local testing when overridden explicitly.
+RELEASE_TAG="${SCRAI_RELEASE_TAG:-__RELEASE_TAG__}"
+SCRAI_VERSION="${SCRAI_VERSION:-__SCRAI_VERSION__}"
+SCALA_VERSION="3.9.0"
+RELEASE_URL="${SCRAI_RELEASE_URL:-https://github.com/$REPOSITORY/releases/download/$RELEASE_TAG}"
 
 if ! command -v curl >/dev/null 2>&1; then
   echo "scrai installation requires curl." >&2
@@ -38,7 +42,7 @@ fi
 
 data_dir=${SCRAI_HOME:-"$HOME/.local/share/scrai"}
 bin_dir=${SCRAI_BIN_DIR:-"$HOME/.local/bin"}
-install_dir="$data_dir/$VERSION"
+install_dir="$data_dir/$SCRAI_VERSION"
 tmp_dir=$(mktemp -d "${TMPDIR:-/tmp}/scrai-install.XXXXXX")
 trap 'rm -rf "$tmp_dir"' EXIT HUP INT TERM
 
@@ -58,10 +62,11 @@ extracted="$tmp_dir/extracted"
 mkdir -p "$extracted" "$bin_dir" "$data_dir"
 unzip -q "$archive" -d "$extracted"
 rm -rf "$install_dir"
+mkdir -p "$install_dir"
 mv "$extracted"/* "$install_dir"
 ln -sfn "$install_dir/bin/scrai" "$bin_dir/scrai"
 
-echo "Installed scrai (Scala $VERSION) to $install_dir"
+echo "Installed scrai $SCRAI_VERSION (Scala $SCALA_VERSION) to $install_dir"
 case ":${PATH:-}:" in
   *:"$bin_dir":*) ;;
   *) echo "Add $bin_dir to PATH to run: scrai" ;;

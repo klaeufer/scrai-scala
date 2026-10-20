@@ -39,8 +39,9 @@ export GROQ_API_KEY=your-key
 scrai
 ```
 
-The installer downloads a versioned GitHub Release archive, verifies its
-SHA-256 checksum, and installs under `~/.local/share/scrai` with a launcher at
+The release installer is pinned to the application version it came from. It
+downloads that exact GitHub Release archive, verifies its SHA-256 checksum, and
+installs under `~/.local/share/scrai/<scrai-version>` with a launcher at
 `~/.local/bin/scrai`. It does not use `sudo` or modify shell startup files.
 Add `~/.local/bin` to `PATH` if the installer reports that it is not already
 there. The standalone REPL evaluates Scala code in its own process; use the sbt

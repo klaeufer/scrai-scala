@@ -45,7 +45,16 @@ lazy val root = project.in(file("."))
       IO.write(launcher,
         """#!/bin/sh
           |set -eu
-          |SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+          |SOURCE=$0
+          |while [ -h "$SOURCE" ]; do
+          |  SOURCE_DIR=$(CDPATH= cd -P "$(dirname -- "$SOURCE")" && pwd)
+          |  SOURCE=$(readlink "$SOURCE")
+          |  case "$SOURCE" in
+          |    /*) ;;
+          |    *) SOURCE="$SOURCE_DIR/$SOURCE" ;;
+          |  esac
+          |done
+          |SCRIPT_DIR=$(CDPATH= cd -P "$(dirname -- "$SOURCE")" && pwd)
           |if ! command -v java >/dev/null 2>&1; then
           |  echo "scrai requires Java 17 or newer on PATH." >&2
           |  exit 1

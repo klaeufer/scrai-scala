@@ -29,6 +29,16 @@ jobs:
         run: python3 scripts/pty_smoke.py
       - name: Create checksum
         run: sha256sum target/scrai-standalone-scala3.9.zip > target/scrai-standalone-scala3.9.zip.sha256
+      - name: Pin installer to this release
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          VERSION="${RELEASE_TAG#v}"
+          sed \
+            -e "s/__RELEASE_TAG__/${RELEASE_TAG}/g" \
+            -e "s/__SCRAI_VERSION__/${VERSION}/g" \
+            install.sh > target/install.sh
+          chmod +x target/install.sh
       - name: Create GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -36,6 +46,6 @@ jobs:
           gh release create "${{ github.ref_name }}"
           target/scrai-standalone-scala3.9.zip
           target/scrai-standalone-scala3.9.zip.sha256
-          install.sh
+          target/install.sh#install.sh
           --generate-notes
           --title "${{ github.ref_name }}"
