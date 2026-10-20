@@ -13,6 +13,12 @@ A teaching-oriented AI input widget for the **official Scala 3 REPL**.
 Type a `//` request, press **Ctrl-G**, review the generated Scala, then press
 Enter to evaluate it. Generation never submits the code automatically.
 
+```scala
+scala> val words = List("pear", "apple", "plum", "apricot")
+scala> // group words by their first letter ───[ Type prompt & press Ctrl-G ]───►
+scala> words.groupBy(_.head)                  ◀───[ Generated code inserted inline ]
+```
+
 **scrai** (pronounced “scry”) blends **Scala**, **REPL**, and **AI**—with a nod
 to *scrying*, or seeking insight. It turns `//` comments into editable Scala code
 while leaving you in control of what runs.
