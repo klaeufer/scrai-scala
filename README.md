@@ -1,4 +1,4 @@
-# scrai-scala
+# scrai-scala (sbt-console-ai)
 
 [![CI](https://github.com/klaeufer/scrai-scala/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/klaeufer/scrai-scala/actions/workflows/ci.yml)
 [![Standalone release](https://github.com/klaeufer/scrai-scala/actions/workflows/release.yml/badge.svg)](https://github.com/klaeufer/scrai-scala/actions/workflows/release.yml)
@@ -9,19 +9,19 @@
 [![macOS and Linux](https://img.shields.io/badge/platform-macOS%20%7C%20Linux-555555?logo=linux&logoColor=white)](#development-and-tests)
 [![AI development transcript](https://img.shields.io/badge/AI%20development-transcript-6f42c1)](doc/ai/transcript.md)
 
-A teaching-oriented AI input widget for the **official Scala 3 REPL**.
+
+**scrai** (pronounced “scry”) blends **Scala**, **REPL**, and **AI**—with a nod
+to *scrying*, or seeking insight. 
+It is lightweight AI input widget for the **native Scala 3 REPL** (standalone CLI) and sbt console plugin (sbt-console-ai). 
+
 Type a `//` request, press **Ctrl-G**, review the generated Scala, then press
-Enter to evaluate it. Generation never submits the code automatically.
+Enter to evaluate it. Generation never submits the code automatically, so you're in control of what runs.
 
 ```scala
 scala> val words = List("pear", "apple", "plum", "apricot")
 scala> // group words by their first letter ───[ Type prompt & press Ctrl-G ]───►
 scala> words.groupBy(_.head)               ◀───[ Generated code inserted inline ]
 ```
-
-**scrai** (pronounced “scry”) blends **Scala**, **REPL**, and **AI**—with a nod
-to *scrying*, or seeking insight. It turns `//` comments into editable Scala code
-while leaving you in control of what runs.
 
 ## Quick start
 
@@ -87,25 +87,25 @@ for evaluation exactly as in the stock REPL.
 
 ### In this repository (development)
 
-```fish
+```bash
 cd /Users/laufer/Work/teaching/cs371/scrai-scala
-set -gx GROQ_API_KEY your-key
+export GROQ_API_KEY=your-key
 sbt runtime/console
 ```
 
-In bash/zsh, use `export GROQ_API_KEY=your-key` instead. Set the key before
-starting sbt; don't put it into Scala input, history, or the configuration file.
+Set the key before starting sbt; don't put it into Scala input, history, or the configuration file.
 Missing credentials do not prevent normal Scala evaluation.
+
+For example,
 
 ```scala
 scala> val words = List("pear", "apple", "plum", "apricot")
 scala> // group words by their first letter
 ```
 
-Press Ctrl-G. A typical result is `words.groupBy(_.head)`, inserted into the
-editable input, not executed. Edit it or press Enter to evaluate. For multiline
-results the usual Scala REPL acceptance rules apply: move to the last line
-before accepting, and enter a blank line if Scala requests a continuation.
+then press Ctrl-G. A typical result is `words.groupBy(_.head)`, inserted into the
+editable input, not executed. Edit it if needed, then press Enter to evaluate. 
+For multiline results the usual Scala REPL acceptance rules apply: move to the last line before accepting, and enter a blank line if Scala requests a continuation.
 You can paste multiple `//` lines as one prompt.
 
 | Input | Action |
