@@ -47,6 +47,12 @@ Add `~/.local/bin` to `PATH` if the installer reports that it is not already
 there. The standalone REPL evaluates Scala code in its own process; use the sbt
 plugin below when the REPL must see a project's classpath and dependencies.
 
+To uninstall:
+
+```sh
+rm -rf $HOME/.local/bin/scrai $HOME/.local/share/scrai $HOME/.scrai_history
+```
+
 ### In your own project (sbt plugin)
 
 Until the plugin is published to Maven Central, publish every supported variant
