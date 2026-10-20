@@ -1,4 +1,4 @@
-package scrai
+package edu.luc.cs.scrai
 
 import sbt._
 import sbt.Keys._
@@ -15,11 +15,11 @@ object ScraiPlugin extends AutoPlugin {
   override def trigger = noTrigger
   override def requires = plugins.JvmPlugin
 
-  private[scrai] val Scrai = config("scrai").hide
+  private val Scrai = config("scrai").hide
   override def projectConfigurations: Seq[Configuration] = Seq(Scrai)
 
   /** Map a supported project Scala version to its runtime artifact, or None. */
-  private[scrai] def runtimeModule(scalaVersion: String): Option[String] =
+  private def runtimeModule(scalaVersion: String): Option[String] =
     if (scalaVersion.startsWith("3.3.")) Some("scrai-runtime_3.3")
     else if (scalaVersion.startsWith("3.4.")) Some("scrai-runtime_3.4")
     else if (scalaVersion.startsWith("3.5.")) Some("scrai-runtime_3.5")
@@ -35,7 +35,7 @@ object ScraiPlugin extends AutoPlugin {
 
   override def projectSettings: Seq[Setting[_]] = Seq(
     libraryDependencies ++= runtimeModule(scalaVersion.value).toSeq.map { name =>
-      "edu.luc.scrai" % name % BuildInfo.version % Scrai.name
+      "edu.luc.cs" % name % BuildInfo.version % Scrai.name
     },
     Compile / console := Def.uncached {
       val module = runtimeModule(scalaVersion.value).getOrElse(sys.error(supportedHint))
@@ -52,7 +52,7 @@ object ScraiPlugin extends AutoPlugin {
         "-cp",
         fullCp,
         "-Dscrai.repl.classpath=" + evalCp,
-        "scrai.Main"
+        "edu.luc.cs.scrai.Main"
       ).directory(baseDirectory.value).inheritIO()
       if (!sys.props("os.name").toLowerCase.contains("windows")) {
         val tty = file("/dev/tty")

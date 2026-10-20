@@ -71,13 +71,13 @@ sbt publishAllLocal
 Then add to `project/plugins.sbt`:
 
 ```scala
-addSbtPlugin("edu.luc.scrai" % "sbt-scrai" % "0.1.0-SNAPSHOT")
+addSbtPlugin("edu.luc.cs" % "sbt-console-ai" % "0.1.0-SNAPSHOT")
 ```
 
 and enable it in `build.sbt`:
 
 ```scala
-import scrai.ScraiPlugin
+import edu.luc.cs.scrai.ScraiPlugin
 
 lazy val root = project.in(file(".")).enablePlugins(ScraiPlugin)
 ```

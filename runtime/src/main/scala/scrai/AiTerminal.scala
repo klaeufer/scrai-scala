@@ -1,6 +1,6 @@
 // Adapted from Scala 3.3.7 JLineTerminal.scala (Apache-2.0).
 // Copyright the Scala contributors. See LICENSE-Scala and THIRD-PARTY-NOTICES.md.
-package scrai
+package edu.luc.cs.scrai
 
 import scala.language.unsafeNulls
 import dotty.tools.repl.ParseResult

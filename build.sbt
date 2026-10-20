@@ -1,6 +1,6 @@
 import scala.sys.process.*
 
-ThisBuild / organization := "edu.luc.scrai"
+ThisBuild / organization := "edu.luc.cs"
 ThisBuild / version := sys.props.getOrElse("scrai.version", "0.1.0-SNAPSHOT")
 
 // Supported lines. Keep runtime module names in sync with ScraiPlugin.runtimeModule.
@@ -59,7 +59,7 @@ lazy val root = project.in(file("."))
           |  echo "scrai requires Java 17 or newer on PATH." >&2
           |  exit 1
           |fi
-          |exec java -cp "$SCRIPT_DIR/../lib/*" scrai.Main "$@"
+          |exec java -cp "$SCRIPT_DIR/../lib/*" edu.luc.cs.scrai.Main "$@"
           |""".stripMargin)
       launcher.setExecutable(true)
       Seq("LICENSE-Scala", "THIRD-PARTY-NOTICES.md").foreach { name =>
@@ -108,7 +108,7 @@ lazy val runtime = project.in(file("runtime"))
              sv.startsWith("3.7.")) Seq.empty
             else Seq("org.scala-lang" %% "scala3-repl" % sv))
     },
-    Compile / mainClass := Some("scrai.Main"),
+    Compile / mainClass := Some("edu.luc.cs.scrai.Main"),
     // Line-specific sources: sbt only adds scala-<binary>, which is "3" for
     // every Scala 3 version, so the minor-line directories must be wired manually.
     Compile / unmanagedSourceDirectories += (Compile / sourceDirectory).value /
@@ -121,7 +121,7 @@ lazy val runtime = project.in(file("runtime"))
       // A real inherited TTY is essential: sbt's Fork helper pipes stdin.
       // sbt's own launcher can also redirect its stdin, so use the controlling
       // terminal explicitly on Unix instead of inheriting that redirected fd.
-      val process = new java.lang.ProcessBuilder(javaExecutable.getAbsolutePath, "-cp", cp, "scrai.Main")
+      val process = new java.lang.ProcessBuilder(javaExecutable.getAbsolutePath, "-cp", cp, "edu.luc.cs.scrai.Main")
         .directory(baseDirectory.value).inheritIO()
       if (!sys.props("os.name").toLowerCase.contains("windows")) {
         val tty = file("/dev/tty")
@@ -135,7 +135,7 @@ lazy val runtime = project.in(file("runtime"))
 
 lazy val plugin = project.in(file("plugin"))
   .settings(
-    name := "sbt-scrai",
+    name := "sbt-console-ai",
     sbtPlugin := true,
     scalaVersion := pluginScala212,
     crossScalaVersions := Seq(pluginScala212, pluginScala3),
@@ -150,7 +150,7 @@ lazy val plugin = project.in(file("plugin"))
     // scrai-runtime artifact from user builds.
     Compile / sourceGenerators += Def.task {
       val f = (Compile / sourceManaged).value / "scrai" / "BuildInfo.scala"
-      IO.write(f, "package scrai\nobject BuildInfo {\n  val version = \"" + version.value + "\"\n}\n")
+      IO.write(f, "package edu.luc.cs.scrai\nobject BuildInfo {\n  val version = \"" + version.value + "\"\n}\n")
       Seq(f)
     }.taskValue
   )

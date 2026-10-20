@@ -7,6 +7,13 @@
 
 ## 1. Scope, method, and how to read this document
 
+**Package naming:** the current Scala package is `edu.luc.cs.scrai`. Source
+files remain in their existing `scrai/` directories; no nested package
+directories were introduced. Code examples use the current package, while
+verbatim historical compiler errors retain the original `scrai` package name.
+The Sonatype organization is `edu.luc.cs`; the sbt plugin artifact is
+`sbt-console-ai`. The standalone launcher remains `scrai`.
+
 This is a curated record of the AI-assisted development of scrai-scala. It was
 written after the fact from the session's own artifacts — the git history, the
 build and smoke-test logs kept in `/tmp/scrai-*.log`, and the committed diffs —
@@ -240,7 +247,7 @@ Compile / console := Def.uncached {
   ...
   val process = new ProcessBuilder(
     javaExecutable.getAbsolutePath, "-cp", fullCp,
-    "-Dscrai.repl.classpath=" + evalCp, "scrai.Main"
+    "-Dscrai.repl.classpath=" + evalCp, "edu.luc.cs.scrai.Main"
   ).directory(baseDirectory.value).inheritIO()
   if (!sys.props("os.name").toLowerCase.contains("windows")) {
     val tty = file("/dev/tty")
@@ -330,7 +337,7 @@ artifact name. The dependency was not rejected outright; it was resolved to
 something that did not exist. The fix is to name the organization explicitly:
 
 ```scala
-"edu.luc.scrai" % name % BuildInfo.version % Scrai.name
+"edu.luc.cs" % name % BuildInfo.version % Scrai.name
 ```
 
 The failure surfaced through the fixture smoke test as a resolver error rather
@@ -359,7 +366,7 @@ fixtures/sbt1/            fixtures/sbt2/
   project/build.properties    project/build.properties
     sbt.version=1.13.0           sbt.version=2.0.11
   project/plugins.sbt        project/plugins.sbt
-    addSbtPlugin("edu.luc.scrai" % "sbt-scrai" % "0.1.0-SNAPSHOT")
+    addSbtPlugin("edu.luc.cs" % "sbt-console-ai" % "0.1.0-SNAPSHOT")
   build.sbt                   build.sbt
     .enablePlugins(ScraiPlugin)   .enablePlugins(ScraiPlugin)
   src/main/scala/Demo.scala  src/main/scala/Demo.scala
@@ -412,10 +419,10 @@ once per sbt line. The resulting local coordinates are:
 
 | Artifact | Coordinates |
 |---|---|
-| runtime, Scala 3.9 | `edu.luc.scrai:scrai-runtime_3.9:0.1.0-SNAPSHOT` |
-| runtime, Scala 3.3 | `edu.luc.scrai:scrai-runtime_3.3:0.1.0-SNAPSHOT` |
-| plugin, sbt 1 | `edu.luc.scrai:sbt-scrai_2.12_1.0:0.1.0-SNAPSHOT` |
-| plugin, sbt 2 | `edu.luc.scrai:sbt-scrai_sbt2_3:0.1.0-SNAPSHOT` |
+| runtime, Scala 3.9 | `edu.luc.cs:scrai-runtime_3.9:0.1.0-SNAPSHOT` |
+| runtime, Scala 3.3 | `edu.luc.cs:scrai-runtime_3.3:0.1.0-SNAPSHOT` |
+| plugin, sbt 1 | `edu.luc.cs:sbt-console-ai_2.12_1.0:0.1.0-SNAPSHOT` |
+| plugin, sbt 2 | `edu.luc.cs:sbt-console-ai_sbt2_3:0.1.0-SNAPSHOT` |
 
 The README originally said `sbt publishLocal`, which publishes only the
 *default* variant of each module — one runtime and one plugin — and would
@@ -639,8 +646,8 @@ October 19, 2026. The runtime cross-build and standalone PTY jobs passed, as did
 some fixture jobs. The failing fixture jobs reported unresolved snapshot
 artifacts:
 
-- sbt 1 + Scala 3.3.7 could not resolve `edu.luc.scrai:scrai-runtime_3.3`.
-- sbt 2 fixtures could not resolve `edu.luc.scrai:sbt-scrai_sbt2_3`.
+- sbt 1 + Scala 3.3.7 could not resolve `edu.luc.cs:scrai-runtime_3.3`.
+- sbt 2 fixtures could not resolve `edu.luc.cs:sbt-console-ai_sbt2_3`.
 
 The failure was not a Scala REPL incompatibility. The fixture job's publication
 commands had been edited into an incomplete list: the 3.3 runtime and sbt 2

@@ -6,7 +6,7 @@ https://github.com/scala/scala3/blob/3.3.7/compiler/src/dotty/tools/repl/JLineTe
 
 Copyright the Scala contributors; distributed under Apache License 2.0.
 The upstream license is included in `LICENSE-Scala`. Changes add AI widgets,
-configuration, and a separate history file, and move the class into `scrai`.
+configuration, and a separate history file, and move the class into `edu.luc.cs.scrai`.
 
 # Third-party dependencies
 

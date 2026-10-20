@@ -1,4 +1,4 @@
-package scrai
+package edu.luc.cs.scrai
 
 import sbt._
 import sbt.Keys._

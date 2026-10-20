@@ -1,4 +1,4 @@
-package scrai
+package edu.luc.cs.scrai
 
 import java.net.URI
 import java.nio.file.{Files, Path}

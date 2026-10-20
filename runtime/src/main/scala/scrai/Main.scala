@@ -1,4 +1,4 @@
-package scrai
+package edu.luc.cs.scrai
 
 import dotty.tools.dotc.core.Contexts.*
 import dotty.tools.repl.*
