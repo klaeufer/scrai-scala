@@ -220,3 +220,7 @@ installer script.
 
 The development history of this project, including the decisions behind the
 plugin conversion, is recorded in [`doc/ai/transcript.md`](doc/ai/transcript.md).
+
+## Inspiration & Acknowledgments
+
+**scrai** was heavily inspired by the elegant, distraction-free workflow of the [fish-ai](https://github.com/Realiserad/fish-ai) shell integration. Experiencing how naturally `fish-ai` allows a developer to generate and iterate on shell commands directly inside the interactive Fish terminal—without context-switching or forced execution—provided the structural blueprint for bringing that exact fluid interface into the native Scala 3 REPL loop.
