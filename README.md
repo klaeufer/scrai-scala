@@ -171,7 +171,7 @@ inference and does not automatically fall back to another model/provider.
 ## Development and tests
 
 ```sh
-sbt runtime/test                               # unit tests on the default 3.9 line
+sbt runtime/test                              # unit tests on the default 3.9 line
 sbt "++3.3.7" "runtime/test"                  # test the 3.3 line
 sbt "++3.10.0" "runtime/test"                 # test the 3.10 line
 python3 scripts/pty_smoke.py                  # PTY smoke via `sbt runtime/console`
