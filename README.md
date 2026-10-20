@@ -15,6 +15,28 @@ Supported combinations: **sbt 1.13.x and sbt 2.0.x**, each with **Scala 3.3.x
 through 3.10.x** projects (scrai drives the compiler's REPL internals and ships
 one runtime variant per Scala minor line; the dev build itself uses sbt 1.13.0).
 
+### Standalone quick install
+
+The standalone distribution runs the AI-enabled REPL with **Scala 3.9.0** and
+does not require sbt, Scala CLI, or a local Scala installation. It requires Java
+17 or newer and a real interactive terminal:
+
+```sh
+curl -fsSL https://github.com/klaeufer/scrai-scala/releases/latest/download/install.sh \
+  -o /tmp/install-scrai.sh
+sh /tmp/install-scrai.sh
+
+export GROQ_API_KEY=your-key
+scrai
+```
+
+The installer downloads a versioned GitHub Release archive, verifies its
+SHA-256 checksum, and installs under `~/.local/share/scrai` with a launcher at
+`~/.local/bin/scrai`. It does not use `sudo` or modify shell startup files.
+Add `~/.local/bin` to `PATH` if the installer reports that it is not already
+there. The standalone REPL evaluates Scala code in its own process; use the sbt
+plugin below when the REPL must see a project's classpath and dependencies.
+
 ### In your own project (sbt plugin)
 
 Until the plugin is published to Maven Central, publish every supported variant
@@ -181,6 +203,10 @@ Implementation:
 - `build.sbt`: multi-module build with the runtime and sbt-plugin cross-builds.
 
 See `THIRD-PARTY-NOTICES.md` and `LICENSE-Scala` for the adapted Scala source.
+
+Tagged releases build and test the standalone Scala 3.9.0 archive on GitHub
+Actions. The release assets include the ZIP, its SHA-256 checksum, and this
+installer script.
 
 The development history of this project, including the decisions behind the
 plugin conversion, is recorded in [`doc/ai/transcript.md`](doc/ai/transcript.md).

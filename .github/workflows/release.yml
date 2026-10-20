@@ -1,0 +1,41 @@
+name: Release standalone distribution
+
+on:
+  push:
+    tags: ["v*.*.*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: sbt
+      - uses: sbt/setup-sbt@v1
+      - name: Build standalone archive
+        env:
+          SCRAI_VERSION: ${{ github.ref_name }}
+        run: sbt -Dscrai.version="${SCRAI_VERSION#v}" standalonePackage
+      - name: Test packaged executable
+        env:
+          SCRAI_SMOKE_EXECUTABLE: ${{ github.workspace }}/target/standalone-staging/bin/scrai
+        run: python3 scripts/pty_smoke.py
+      - name: Create checksum
+        run: sha256sum target/scrai-standalone-scala3.9.zip > target/scrai-standalone-scala3.9.zip.sha256
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh release create "${{ github.ref_name }}"
+          target/scrai-standalone-scala3.9.zip
+          target/scrai-standalone-scala3.9.zip.sha256
+          install.sh
+          --generate-notes
+          --title "${{ github.ref_name }}"

@@ -6,6 +6,7 @@ Requires macOS/Linux, Python 3, Java, and sbt on PATH. No Python dependencies.
 Environment overrides:
   SCRAI_SMOKE_TASK  sbt task to run (default: runtime/console)
   SCRAI_SMOKE_CWD   directory for the sbt invocation (default: current dir)
+  SCRAI_SMOKE_EXECUTABLE  executable to run instead of sbt
 """
 
 import errno
@@ -65,7 +66,11 @@ def main():
             if cwd:
                 os.chdir(cwd)
             os.environ.update(SCRAI_CONFIG=str(config), GROQ_API_KEY="test-key", TERM="xterm-256color")
-            os.execvp("sbt", ["sbt", "-batch", task])
+            executable = os.environ.get("SCRAI_SMOKE_EXECUTABLE")
+            if executable:
+                os.execv(executable, [executable])
+            else:
+                os.execvp("sbt", ["sbt", "-batch", task])
         transcript = bytearray()
 
         def read_until(needle, start=0, timeout=90):
@@ -146,7 +151,8 @@ def main():
                 result, status = os.waitpid(pid, os.WNOHANG)
                 if result:
                     assert os.waitstatus_to_exitcode(status) == 0, status
-                    print("PASS: sbt console, evaluation, context, hotkey, multiline insertion without execution, restore, explicit execution, clear, HTTP failure, cancellation, completion, reset, quit")
+                    mode = "packaged executable" if os.environ.get("SCRAI_SMOKE_EXECUTABLE") else "sbt console"
+                    print(f"PASS: {mode}, evaluation, context, hotkey, multiline insertion without execution, restore, explicit execution, clear, HTTP failure, cancellation, completion, reset, quit")
                     return
                 if select.select([fd], [], [], 0.2)[0]:
                     try:

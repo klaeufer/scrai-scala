@@ -1,5 +1,7 @@
+import scala.sys.process.*
+
 ThisBuild / organization := "edu.luc.scrai"
-ThisBuild / version := "0.1.0-SNAPSHOT"
+ThisBuild / version := sys.props.getOrElse("scrai.version", "0.1.0-SNAPSHOT")
 
 // Supported lines. Keep runtime module names in sync with ScraiPlugin.runtimeModule.
 val scala33 = "3.3.7"
@@ -14,12 +16,61 @@ val sbt1Version = "1.13.0"
 val sbt2Version = "2.0.11"
 val pluginScala212 = "2.12.21"
 val pluginScala3 = "3.8.4" // matches sbt 2.0.11's embedded Scala
+val standalonePackage = taskKey[File]("Package the standalone Scala 3.9 AI REPL distribution")
 
 lazy val root = project.in(file("."))
   .aggregate(runtime, plugin)
   .settings(
     name := "scrai-scala",
     publish / skip := true,
+    standalonePackage := {
+      val log = streams.value.log
+      val staging = target.value / "standalone-staging"
+      val archive = target.value / "scrai-standalone-scala3.9.zip"
+      IO.delete(staging)
+      IO.delete(archive)
+      val bin = staging / "bin"
+      val lib = staging / "lib"
+      IO.createDirectory(bin)
+      IO.createDirectory(lib)
+
+      val runtimeJar = (runtime / Compile / packageBin).value
+      val runtimeClasspath = (runtime / Compile / fullClasspath).value.files
+        .filter(_.isFile)
+        .filterNot(_ == runtimeJar)
+      IO.copyFile(runtimeJar, lib / runtimeJar.getName)
+      runtimeClasspath.foreach(jar => IO.copyFile(jar, lib / jar.getName))
+
+      val launcher = bin / "scrai"
+      IO.write(launcher,
+        """#!/bin/sh
+          |set -eu
+          |SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+          |if ! command -v java >/dev/null 2>&1; then
+          |  echo "scrai requires Java 17 or newer on PATH." >&2
+          |  exit 1
+          |fi
+          |exec java -cp "$SCRIPT_DIR/../lib/*" scrai.Main "$@"
+          |""".stripMargin)
+      launcher.setExecutable(true)
+      Seq("LICENSE-Scala", "THIRD-PARTY-NOTICES.md").foreach { name =>
+        IO.copyFile(baseDirectory.value / name, staging / name)
+      }
+
+      // sbt's ZIP helper does not preserve the executable bit. Prefer the
+      // platform ZIP tool so extracted releases can invoke bin/scrai directly;
+      // retain the sbt fallback for platforms without that command.
+      val unix = sys.props.get("os.name").exists { name =>
+        val lower = name.toLowerCase
+        lower.contains("mac") || lower.contains("linux")
+      }
+      if (unix && Process(Seq("zip", "-q", "-r", archive.getAbsolutePath, "bin", "lib", "LICENSE-Scala", "THIRD-PARTY-NOTICES.md"), staging).! == 0)
+        ()
+      else
+        IO.zip(Path.allSubpaths(staging).toSeq.map { case (file, relative) => file -> relative }, archive)
+      log.info("Wrote standalone distribution: " + archive)
+      archive
+    },
     // Publish every supported variant so fixtures and users on any supported
     // line can resolve everything from one command.
     addCommandAlias(
@@ -61,7 +112,7 @@ lazy val runtime = project.in(file("runtime"))
       // A real inherited TTY is essential: sbt's Fork helper pipes stdin.
       // sbt's own launcher can also redirect its stdin, so use the controlling
       // terminal explicitly on Unix instead of inheriting that redirected fd.
-      val process = new ProcessBuilder(javaExecutable.getAbsolutePath, "-cp", cp, "scrai.Main")
+      val process = new java.lang.ProcessBuilder(javaExecutable.getAbsolutePath, "-cp", cp, "scrai.Main")
         .directory(baseDirectory.value).inheritIO()
       if (!sys.props("os.name").toLowerCase.contains("windows")) {
         val tty = file("/dev/tty")
