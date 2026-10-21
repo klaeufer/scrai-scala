@@ -8,6 +8,9 @@
 [![Java 17+](https://img.shields.io/badge/Java-17%2B-437291?logo=openjdk&logoColor=white)](#quick-start)
 [![macOS and Linux](https://img.shields.io/badge/platform-macOS%20%7C%20Linux-555555?logo=linux&logoColor=white)](#development-and-tests)
 [![AI development transcript](https://img.shields.io/badge/AI%20development-transcript-6f42c1)](doc/ai/transcript.md)
+[![Latest GitHub release](https://img.shields.io/github/v/release/klaeufer/scrai-scala)](https://github.com/klaeufer/scrai-scala/releases/latest)
+[![License: Apache-2.0](https://img.shields.io/github/license/klaeufer/scrai-scala)](LICENSE-Scala)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/klaeufer/scrai-scala/badge)](https://scorecard.dev/viewer/?uri=github.com/klaeufer/scrai-scala)
 
 
 **scrai** (pronounced “scry”) blends **Scala**, **REPL**, and **AI**—with a nod
