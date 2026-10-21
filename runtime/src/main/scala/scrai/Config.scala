@@ -31,7 +31,7 @@ object Config:
   def parse(text: String, profileOverride: Option[String] = None): Config =
     val sections = mutable.Map.empty[String, mutable.Map[String, String]]
     var section = "scrai"
-    text.linesIterator.zipWithIndex.foreach { (raw, index) =>
+    text.linesIterator.zipWithIndex.foreach: (raw, index) =>
       val line = raw.trim
       if line.nonEmpty && !line.startsWith("#") && !line.startsWith(";") then
         if line.startsWith("[") && line.endsWith("]") then section = line.drop(1).dropRight(1).trim
@@ -39,12 +39,12 @@ object Config:
           val split = line.indexOf('=')
           require(split > 0, s"Invalid config line ${index + 1}")
           sections.getOrElseUpdate(section, mutable.Map.empty)(line.take(split).trim) = line.drop(split + 1).trim
-    }
+
     val global = sections.get("scrai").map(_.toMap).getOrElse(Map.empty)
     val profile = profileOverride.orElse(global.get("profile"))
-    val selected = profile.map { name =>
+    val selected = profile.map: name =>
       sections.getOrElse(name, throw IllegalArgumentException(s"Unknown profile: $name")).toMap
-    }.getOrElse(Map.empty)
+    .getOrElse(Map.empty)
     val values = (global - "profile") ++ selected
     val known = Set("model", "base_url", "api_key_env", "temperature", "max_tokens", "timeout_seconds",
       "context_chars", "hotkey", "restore_hotkey", "instructions")

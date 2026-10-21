@@ -28,9 +28,9 @@ abstract class AiRepl(config: Config, generator: Generator, classpath: String)
         given Context = state.context
         val completer: Completer = (_, line, candidates) =>
           val labels = completionLabels(line.cursor(), line.line(), state)
-          candidates.addAll(labels.distinct.map { label =>
+          candidates.addAll(labels.distinct.map: label =>
             new Candidate(label, label.stripPrefix("`").stripSuffix("`"), null, null, null, null, false)
-          }.asJava)
+          .asJava)
         try
           val input = terminal.readLine(completer)
           if input.trim == ":ai-clear" then

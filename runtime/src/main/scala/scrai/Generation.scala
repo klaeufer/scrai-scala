@@ -8,9 +8,9 @@ import java.util.concurrent.CompletableFuture
 object Prompt:
   def extract(buffer: String): Option[String] =
     val lines = buffer.linesIterator.toVector
-    Option.when(lines.nonEmpty && lines.forall(l => l.trim.isEmpty || l.trim.startsWith("//"))) {
+    Option.when(lines.nonEmpty && lines.forall(l => l.trim.isEmpty || l.trim.startsWith("//"))):
       lines.map(_.trim.stripPrefix("//").stripLeading()).mkString("\n").trim
-    }.filter(_.nonEmpty)
+    .filter(_.nonEmpty)
 
   def clean(response: String): String =
     require(!response.exists(c => Character.isISOControl(c) && c != '\n' && c != '\t' && c != '\r'),
@@ -38,9 +38,8 @@ final class GroqGenerator(config: Config, env: Map[String, String] = sys.env) ex
   private val client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(config.timeoutSeconds)).build()
 
   def generate(prompt: String, context: String): CompletableFuture[String] =
-    val key = env.get(config.apiKeyEnv).filter(_.nonEmpty).getOrElse {
+    val key = env.get(config.apiKeyEnv).filter(_.nonEmpty).getOrElse:
       throw IllegalArgumentException(s"Set ${config.apiKeyEnv} before launching scrai; normal Scala evaluation still works.")
-    }
     val scalaV = dotty.tools.dotc.config.Properties.versionNumberString
     val system = s"""Generate Scala $scalaV code for the official Scala REPL. Return ONLY Scala code, without Markdown,
       |explanations, REPL prompts, or REPL commands. Do not repeat existing definitions unless asked.
@@ -62,7 +61,7 @@ final class GroqGenerator(config: Config, env: Map[String, String] = sys.env) ex
       .header("Content-Type", "application/json")
       .POST(HttpRequest.BodyPublishers.ofString(body.toString)).build()
     val transport = client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-    val result = transport.thenApply { response =>
+    val result = transport.thenApply: response =>
       if response.statusCode() != 200 then
         val hint = response.statusCode() match
           case 401 | 403 => "check your API key and model permissions"
@@ -74,9 +73,7 @@ final class GroqGenerator(config: Config, env: Map[String, String] = sys.env) ex
       val choice = json("choices")(0)
       require(choice.obj.get("finish_reason").forall(_ != ujson.Str("length")), "Generation was truncated; increase max_tokens")
       Prompt.clean(choice("message")("content").str)
-    }
-    result.whenComplete { (_, _) =>
+    result.whenComplete: (_, _) =>
       if result.isCancelled then transport.cancel(true)
       ()
-    }
     result
