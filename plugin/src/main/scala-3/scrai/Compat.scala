@@ -10,4 +10,3 @@ private[scrai] object Compat:
   val projectPaths = Def.task:
     implicit val conv: FileConverter = fileConverter.value
     toNioPaths((Compile / fullClasspath).value).map(_.toFile)
-}
