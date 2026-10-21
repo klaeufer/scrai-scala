@@ -109,10 +109,17 @@ lazy val runtime = project.in(file("runtime"))
             else Seq("org.scala-lang" %% "scala3-repl" % sv))
     },
     Compile / mainClass := Some("edu.luc.cs.scrai.Main"),
-    // Line-specific sources: sbt only adds scala-<binary>, which is "3" for
-    // every Scala 3 version, so the minor-line directories must be wired manually.
-    Compile / unmanagedSourceDirectories += (Compile / sourceDirectory).value /
-      ("scala-" + scalaVersion.value.split('.').take(2).mkString(".")),
+    // Scala 3.3, 3.4, and 3.5+ expose three completion API shapes. The
+    // 3.5 implementation remains source-compatible through Scala 3.10, so
+    // reuse it rather than maintaining one identical adapter per minor line.
+    Compile / unmanagedSourceDirectories += {
+      val minor = scalaVersion.value.split('.').take(2).mkString(".")
+      val sourceLine =
+        if (minor == "3.3") "3.3"
+        else if (minor == "3.4") "3.4"
+        else "3.5"
+      (Compile / sourceDirectory).value / ("scala-" + sourceLine)
+    },
     Compile / run / fork := true,
     Compile / run / javaOptions += "--enable-native-access=ALL-UNNAMED",
     Compile / run / connectInput := true,
