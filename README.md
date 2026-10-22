@@ -189,6 +189,7 @@ inference and does not automatically fall back to another model/provider.
 sbt runtime/test                              # unit tests on the default 3.9 line
 sbt "++3.3.7" "runtime/test"                  # test the 3.3 line
 sbt "++3.10.0" "runtime/test"                 # test the 3.10 line
+sbt "coverage" "runtime/test" "coverageReport"  # coverage report in runtime/target/coverage-report
 python3 scripts/pty_smoke.py                  # PTY smoke via `sbt runtime/console`
 sbt publishAllLocal                           # publish all runtime + plugin variants
 SCRAI_SMOKE_CWD=fixtures/sbt1 SCRAI_SMOKE_TASK=console python3 scripts/pty_smoke.py
@@ -206,6 +207,10 @@ per-line source directories), `plugin/` (the sbt plugin, cross-built for sbt 1
 and sbt 2 via `crossSbtVersions` plus `sbt2-compat`), and `fixtures/`
 (standalone consumer builds on sbt 1 and sbt 2 used by CI to smoke-test the
 plugin through `publishLocal`).
+
+Code coverage is measured with the sbt-scoverage plugin; the CI "Code coverage"
+job writes the reports to `runtime/target/coverage-report` and uploads them to
+Codecov when a `CODECOV_TOKEN` secret is available.
 
 Unit tests use a local HTTP server; the pseudo-terminal smoke test invokes
 `sbt console` with a fake model and exercises real terminal editing. Neither
