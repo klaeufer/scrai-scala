@@ -1,17 +1,15 @@
 # scrai-scala (sbt-console-ai)
 
 [![CI](https://github.com/klaeufer/scrai-scala/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/klaeufer/scrai-scala/actions/workflows/ci.yml)
-[![Standalone release](https://github.com/klaeufer/scrai-scala/actions/workflows/release.yml/badge.svg)](https://github.com/klaeufer/scrai-scala/actions/workflows/release.yml)
-[![Scala 3.3–3.10](https://img.shields.io/badge/Scala-3.3%E2%80%933.10-FDCB00?logo=scala&logoColor=white)](#quick-start)
-[![sbt 1.13 / 2.0](https://img.shields.io/badge/sbt-1.13%20%2F%202.0-FF6F00?logo=sbt&logoColor=white)](#quick-start)
-[![Standalone Scala 3.9.0](https://img.shields.io/badge/standalone-Scala%203.9.0-FDCB00?logo=scala&logoColor=white)](#standalone-quick-install)
-[![Java 17+](https://img.shields.io/badge/Java-17%2B-437291?logo=openjdk&logoColor=white)](#quick-start)
-[![macOS and Linux](https://img.shields.io/badge/platform-macOS%20%7C%20Linux-555555?logo=linux&logoColor=white)](#development-and-tests)
-[![AI development transcript](https://img.shields.io/badge/AI%20development-transcript-6f42c1)](doc/ai/transcript.md)
+[![Codecov coverage](https://codecov.io/gh/klaeufer/scrai-scala/graph/badge.svg)](https://codecov.io/gh/klaeufer/scrai-scala)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/klaeufer/scrai-scala/badge)](https://scorecard.dev/viewer/?uri=github.com/klaeufer/scrai-scala)
+[![Release build](https://github.com/klaeufer/scrai-scala/actions/workflows/release.yml/badge.svg)](https://github.com/klaeufer/scrai-scala/actions/workflows/release.yml)
 [![Latest GitHub release](https://img.shields.io/github/v/release/klaeufer/scrai-scala)](https://github.com/klaeufer/scrai-scala/releases/latest)
 [![License: Apache-2.0](https://img.shields.io/github/license/klaeufer/scrai-scala)](LICENSE-Scala)
-[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/klaeufer/scrai-scala/badge)](https://scorecard.dev/viewer/?uri=github.com/klaeufer/scrai-scala)
-[![Codecov coverage](https://codecov.io/gh/klaeufer/scrai-scala/graph/badge.svg)](https://codecov.io/gh/klaeufer/scrai-scala)
+[![Scala 3.3–3.10](https://img.shields.io/badge/Scala-3.3%E2%80%933.10-FDCB00?logo=scala&logoColor=white)](#quick-start)
+[![sbt 1.13 / 2.0](https://img.shields.io/badge/sbt-1.13%20%2F%202.0-FF6F00?logo=sbt&logoColor=white)](#quick-start)
+[![Java 17+](https://img.shields.io/badge/Java-17%2B-437291?logo=openjdk&logoColor=white)](#quick-start)
+[![macOS and Linux](https://img.shields.io/badge/platform-macOS%20%7C%20Linux-555555?logo=linux&logoColor=white)](#development-and-tests)
 
 
 **scrai** (pronounced “scry”) blends **Scala**, **REPL**, and **AI**—with a nod
@@ -35,6 +33,8 @@ through 3.10.x** projects (scrai drives the compiler's REPL internals and ships
 one runtime variant per Scala minor line; the dev build itself uses sbt 1.13.0).
 
 ### Standalone quick install
+
+![Standalone Scala 3.9.0](https://img.shields.io/badge/standalone-Scala%203.9.0-FDCB00?logo=scala&logoColor=white)
 
 The standalone distribution runs the AI-enabled REPL with **Scala 3.9.0** and
 does not require sbt, Scala CLI, or a local Scala installation. It requires Java
@@ -185,6 +185,8 @@ inference and does not automatically fall back to another model/provider.
   restricted JVM APIs.
 
 ## Development and tests
+
+[![AI development transcript](https://img.shields.io/badge/AI%20development-transcript-6f42c1)](doc/ai/transcript.md)
 
 ```sh
 sbt runtime/test                              # unit tests on the default 3.9 line
