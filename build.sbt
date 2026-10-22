@@ -1,7 +1,26 @@
 import scala.sys.process.*
 
 ThisBuild / organization := "edu.luc.cs"
-ThisBuild / version := sys.props.getOrElse("scrai.version", "0.1.3-SNAPSHOT")
+ThisBuild / version := sys.props.get("scrai.version")
+  .orElse(sys.props.get("version"))
+  .getOrElse("0.1.3-SNAPSHOT")
+ThisBuild / organizationName := "Loyola University Chicago"
+ThisBuild / organizationHomepage := Some(url("https://www.luc.edu/"))
+ThisBuild / homepage := Some(url("https://github.com/klaeufer/scrai-scala"))
+ThisBuild / licenses := Seq("Apache-2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0.txt"))
+ThisBuild / scmInfo := Some(ScmInfo(
+  url("https://github.com/klaeufer/scrai-scala"),
+  "scm:git:https://github.com/klaeufer/scrai-scala.git"
+))
+ThisBuild / developers := List(Developer(
+  id = "klaeufer",
+  name = "Konstantin Läufer",
+  email = "laufer@cs.luc.edu",
+  url = url("https://www.luc.edu/cs/")))
+ThisBuild / pomIncludeRepository := { _ => false }
+ThisBuild / publishMavenStyle := true
+// Stage locally only. Central upload is a separate, explicit action.
+ThisBuild / publishTo := localStaging.value
 
 // Supported lines. Keep runtime module names in sync with ScraiPlugin.runtimeModule.
 val scala33 = "3.3.7"
@@ -85,12 +104,21 @@ lazy val root = project.in(file("."))
     addCommandAlias(
       "publishAllLocal",
       "runtime/publishLocal; plugin/publishLocal; ++3.3.7; runtime/publishLocal; ++3.4.3; runtime/publishLocal; ++3.5.2; runtime/publishLocal; ++3.6.4; runtime/publishLocal; ++3.7.4; runtime/publishLocal; ++3.8.4; runtime/publishLocal; ++3.9.0; runtime/publishLocal; ++3.10.0; runtime/publishLocal; ++3.8.4; plugin/publishLocal"
+    ),
+    addCommandAlias(
+      "stageAll",
+      "coverageOff; clean; set ThisBuild / version := sys.props.getOrElse(\"scrai.version\", version.value); ++3.3.7; runtime/publish; ++3.4.3; runtime/publish; ++3.5.2; runtime/publish; ++3.6.4; runtime/publish; ++3.7.4; runtime/publish; ++3.8.4; runtime/publish; ++3.9.0; runtime/publish; ++3.10.0; runtime/publish; ++2.12.21; plugin/publish; ++3.8.4; plugin/publish"
+    ),
+    addCommandAlias(
+      "stageAllSigned",
+      "coverageOff; clean; set ThisBuild / version := sys.props.getOrElse(\"scrai.version\", version.value); ++3.3.7; runtime/publishSigned; ++3.4.3; runtime/publishSigned; ++3.5.2; runtime/publishSigned; ++3.6.4; runtime/publishSigned; ++3.7.4; runtime/publishSigned; ++3.8.4; runtime/publishSigned; ++3.9.0; runtime/publishSigned; ++3.10.0; runtime/publishSigned; ++2.12.21; plugin/publishSigned; ++3.8.4; plugin/publishSigned"
     )
   )
 
 lazy val runtime = project.in(file("runtime"))
   .settings(
     name := "scrai-runtime",
+    description := "AI-assisted input widget and core runtime for the Scala 3 REPL",
     // One artifact per Scala line (e.g. scrai-runtime_3.3); crossPaths off
     // because the line suffix is added manually above.
     moduleName := "scrai-runtime_" + scalaVersion.value.split('.').take(2).mkString("."),
@@ -154,6 +182,7 @@ lazy val runtime = project.in(file("runtime"))
 lazy val plugin = project.in(file("plugin"))
   .settings(
     name := "sbt-console-ai",
+    description := "sbt plugin that adds the scrai AI-assisted Scala REPL to sbt console",
     sbtPlugin := true,
     scalaVersion := pluginScala212,
     crossScalaVersions := Seq(pluginScala212, pluginScala3),

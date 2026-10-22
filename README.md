@@ -73,6 +73,34 @@ locally from a clone:
 sbt publishAllLocal
 ```
 
+### Preparing a Maven Central release locally
+
+The repository includes `stageAll` and `stageAllSigned` commands to assemble
+the eight Scala runtime variants and both sbt plugin variants in sbt's local
+Central staging directory (`target/sona-staging`). These commands do not upload
+anything. Choose a release version that is not already published, then run:
+
+```sh
+sbt -Dscrai.version=0.1.3 stageAll
+python3 scripts/validate_maven_staging.py --version 0.1.3
+```
+
+The validator checks the expected coordinates, version, POM metadata, and
+binary/sources/javadoc artifacts. It does not establish that the Central Portal
+will accept the bundle; its server-side validation is still required.
+
+After installing GnuPG and configuring a signing key with a publicly available
+key, stage signatures and validate their presence with:
+
+```sh
+sbt -Dscrai.version=0.1.3 stageAllSigned
+python3 scripts/validate_maven_staging.py --version 0.1.3 --signed
+```
+
+The local GPG agent may prompt for the key passphrase. Neither command contacts
+Sonatype. Uploading is intentionally a separate step, requiring Central Portal
+credentials and a deliberate `sonaUpload` or `sonaRelease` action.
+
 Then add to `project/plugins.sbt`:
 
 ```scala
