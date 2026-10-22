@@ -2,6 +2,7 @@
 
 [![CI](https://github.com/klaeufer/scrai-scala/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/klaeufer/scrai-scala/actions/workflows/ci.yml)
 [![Codecov coverage](https://codecov.io/gh/klaeufer/scrai-scala/graph/badge.svg)](https://codecov.io/gh/klaeufer/scrai-scala)
+[![Codacy grade](https://app.codacy.com/project/badge/Grade/2a1b4228514a40c4af5254bc8e024c5f)](https://app.codacy.com/gh/klaeufer/scrai-scala)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/klaeufer/scrai-scala/badge)](https://scorecard.dev/viewer/?uri=github.com/klaeufer/scrai-scala)
 [![Release build](https://github.com/klaeufer/scrai-scala/actions/workflows/release.yml/badge.svg)](https://github.com/klaeufer/scrai-scala/actions/workflows/release.yml)
 [![Latest GitHub release](https://img.shields.io/github/v/release/klaeufer/scrai-scala)](https://github.com/klaeufer/scrai-scala/releases/latest)
@@ -34,7 +35,7 @@ one runtime variant per Scala minor line; the dev build itself uses sbt 1.13.0).
 
 ### Standalone quick install
 
-![Standalone Scala 3.9.0](https://img.shields.io/badge/standalone-Scala%203.9.0-FDCB00?logo=scala&logoColor=white)
+[![Standalone Scala 3.9.0](https://img.shields.io/badge/standalone-Scala%203.9.0-FDCB00?logo=scala&logoColor=white)](https://github.com/klaeufer/scrai-scala/releases/latest/download/install.sh)
 
 The standalone distribution runs the AI-enabled REPL with **Scala 3.9.0** and
 does not require sbt, Scala CLI, or a local Scala installation. It requires Java
