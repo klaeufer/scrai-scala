@@ -65,9 +65,12 @@ jobs:
         with:
           files: runtime/target/coverage-report/cobertura.xml
           flags: runtime
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-        # The repository is public, so a missing token must not break the build.
+          # Tokenless upload via OIDC: the repository is public, and the
+          # protected main branch otherwise requires a CODECOV_TOKEN.
+          use_oidc: true
+        permissions:
+          id-token: write
+        # The upload is best-effort: coverage reporting must not break CI.
         continue-on-error: true
 
   smoke:
