@@ -66,19 +66,31 @@ rm -rf $HOME/.local/bin/scrai $HOME/.local/share/scrai $HOME/.scrai_history
 
 ### In your own project (sbt plugin)
 
-Until the plugin is published to Maven Central, publish every supported variant
-locally from a clone:
+Add the published plugin to `project/plugins.sbt`:
 
-```sh
-sbt publishAllLocal
+```scala
+addSbtPlugin("edu.luc.cs" % "sbt-console-ai" % "0.1.3")
 ```
 
-### Preparing a Maven Central release locally
+Then enable it in `build.sbt`:
+
+```scala
+import edu.luc.cs.scrai.ScraiPlugin
+
+lazy val root = project.in(file(".")).enablePlugins(ScraiPlugin)
+```
+
+`sbt console` now starts the AI REPL, with your project's classpath available
+for evaluation exactly as in the stock REPL.
+
+### Preparing and publishing a Maven Central release
 
 The repository includes `stageAll` and `stageAllSigned` commands to assemble
 the eight Scala runtime variants and both sbt plugin variants in sbt's local
 Central staging directory (`target/sona-staging`). These commands do not upload
-anything. Choose a release version that is not already published, then run:
+anything. Choose a release version that is not already published, then stage
+and validate the artifacts (replace `0.1.3` with the intended release version
+as appropriate):
 
 ```sh
 sbt -Dscrai.version=0.1.3 stageAll
@@ -97,26 +109,34 @@ sbt -Dscrai.version=0.1.3 stageAllSigned
 python3 scripts/validate_maven_staging.py --version 0.1.3 --signed
 ```
 
-The local GPG agent may prompt for the key passphrase. Neither command contacts
-Sonatype. Uploading is intentionally a separate step, requiring Central Portal
-credentials and a deliberate `sonaUpload` or `sonaRelease` action.
+The local GPG agent may prompt for the key passphrase. Neither staging command
+contacts Sonatype. Once signed staging validates, set Central Portal token
+credentials as `SONATYPE_USERNAME` and `SONATYPE_PASSWORD`, then upload the
+staged bundle:
 
-Then add to `project/plugins.sbt`:
-
-```scala
-addSbtPlugin("edu.luc.cs" % "sbt-console-ai" % "0.1.3-SNAPSHOT")
+```sh
+sbt -Dscrai.version=0.1.3 sonaUpload
 ```
 
-and enable it in `build.sbt`:
+Review the deployment in Central Publisher Portal. After server-side validation
+succeeds, publish it there and wait until its status is `PUBLISHED`. Verify that
+the release resolves from Maven Central before announcing it to consumers.
 
-```scala
-import edu.luc.cs.scrai.ScraiPlugin
+### Releasing
 
-lazy val root = project.in(file(".")).enablePlugins(ScraiPlugin)
+After the Maven artifacts are published, commit and push the release-ready
+source (including updated release documentation), and ensure CI passes. Create
+an annotated version tag at that commit and push it:
+
+```sh
+git tag -a v0.1.3 -m "Release 0.1.3"
+git push origin v0.1.3
 ```
 
-`sbt console` now starts the AI REPL, with your project's classpath available
-for evaluation exactly as in the stock REPL.
+Pushing a `v*.*.*` tag triggers the GitHub Actions release workflow. It builds
+and smoke-tests the standalone Scala 3.9 distribution, then creates a GitHub
+Release containing the ZIP, SHA-256 checksum, and version-pinned installer.
+Check the workflow run and the generated GitHub Release after pushing the tag.
 
 ### In this repository (development)
 
