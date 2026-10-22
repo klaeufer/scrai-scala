@@ -11,6 +11,7 @@
 [![Latest GitHub release](https://img.shields.io/github/v/release/klaeufer/scrai-scala)](https://github.com/klaeufer/scrai-scala/releases/latest)
 [![License: Apache-2.0](https://img.shields.io/github/license/klaeufer/scrai-scala)](LICENSE-Scala)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/klaeufer/scrai-scala/badge)](https://scorecard.dev/viewer/?uri=github.com/klaeufer/scrai-scala)
+[![Codecov coverage](https://codecov.io/gh/klaeufer/scrai-scala/graph/badge.svg)](https://codecov.io/gh/klaeufer/scrai-scala)
 
 
 **scrai** (pronounced “scry”) blends **Scala**, **REPL**, and **AI**—with a nod
