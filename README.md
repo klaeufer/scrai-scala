@@ -1,7 +1,7 @@
 # scrai-scala (sbt-console-ai)
 
 [![CI](https://github.com/klaeufer/scrai-scala/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/klaeufer/scrai-scala/actions/workflows/ci.yml)
-[![Codecov coverage](https://codecov.io/gh/klaeufer/scrai-scala/graph/badge.svg)](https://codecov.io/gh/klaeufer/scrai-scala)
+[![Core/unit-test coverage](https://codecov.io/gh/klaeufer/scrai-scala/graph/badge.svg)](https://codecov.io/gh/klaeufer/scrai-scala)
 [![Codacy grade](https://app.codacy.com/project/badge/Grade/2a1b4228514a40c4af5254bc8e024c5f)](https://app.codacy.com/gh/klaeufer/scrai-scala)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/klaeufer/scrai-scala/badge)](https://scorecard.dev/viewer/?uri=github.com/klaeufer/scrai-scala)
 [![Release build](https://github.com/klaeufer/scrai-scala/actions/workflows/release.yml/badge.svg)](https://github.com/klaeufer/scrai-scala/actions/workflows/release.yml)
@@ -212,9 +212,14 @@ and sbt 2 via `crossSbtVersions` plus `sbt2-compat`), and `fixtures/`
 (standalone consumer builds on sbt 1 and sbt 2 used by CI to smoke-test the
 plugin through `publishLocal`).
 
-Code coverage is measured with the sbt-scoverage plugin; the CI "Code coverage"
-job writes the reports to `runtime/target/coverage-report` and uploads them to
-Codecov when a `CODECOV_TOKEN` secret is available.
+Code coverage is measured with the sbt-scoverage plugin as **core/unit-test
+coverage**. The report excludes `AiTerminal.scala`, `Main.scala` (the interactive
+REPL loop and launcher), and `VersionedAiRepl.scala` (the Scala-version-specific
+completion adapters); these terminal integration paths are exercised separately
+by the PTY smoke tests. Configuration and generation logic remain included in
+the unit coverage report. The CI "Code coverage" job writes the reports to
+`runtime/target/coverage-report` and uploads them to Codecov when a
+`CODECOV_TOKEN` secret is available.
 
 Unit tests use a local HTTP server; the pseudo-terminal smoke test invokes
 `sbt console` with a fake model and exercises real terminal editing. Neither

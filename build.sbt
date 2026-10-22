@@ -108,6 +108,10 @@ lazy val runtime = project.in(file("runtime"))
              sv.startsWith("3.7.")) Seq.empty
             else Seq("org.scala-lang" %% "scala3-repl" % sv))
     },
+    // Coverage here targets core logic exercised by unit tests. Interactive
+    // terminal/REPL wiring is validated separately by the PTY smoke tests.
+    // Keep this list narrow; Config and Generation remain in the report.
+    coverageExcludedPackages := "edu\\.luc\\.cs\\.scrai\\.(AiTerminal|AiRepl|Main|VersionedAiRepl)",
     Compile / mainClass := Some("edu.luc.cs.scrai.Main"),
     // Scala 3.3, 3.4, and 3.5+ expose three completion API shapes. The
     // 3.5 implementation remains source-compatible through Scala 3.10, so
