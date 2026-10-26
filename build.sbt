@@ -33,7 +33,7 @@ val scala39 = "3.9.0"
 val scala310 = "3.10.0"
 val sbt1Version = "1.13.0"
 val sbt2Version = "2.0.11"
-val pluginScala212 = "2.12.21"
+val pluginScala212 = "2.13.18"
 val pluginScala3 = "3.8.4" // matches sbt 2.0.11's embedded Scala
 val standalonePackage = taskKey[File]("Package the standalone Scala 3.9 AI REPL distribution")
 
