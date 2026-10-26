@@ -84,6 +84,11 @@ lazy val root = project.in(file(".")).enablePlugins(ScraiPlugin)
 `sbt console` now starts the AI REPL, with your project's classpath available
 for evaluation exactly as in the stock REPL.
 
+`sbt consoleQuick` starts the same AI REPL with external dependencies only,
+without compiling the current project's sources or including its compiled
+classes (even if they already exist). Like stock sbt, source dependencies may
+still require compilation.
+
 ### Preparing and publishing a Maven Central release
 
 The repository includes `stageAll` and `stageAllSigned` commands to assemble
@@ -223,13 +228,13 @@ inference and does not automatically fall back to another model/provider.
   execute it. There is no sandbox, automatic evaluation, or automatic repair.
 - HTTPS is required except for local servers. API keys are read from environment
   variables; provider error bodies are not printed.
-- The sbt plugin overrides `Compile / console` when `enablePlugins(ScraiPlugin)`
+- The sbt plugin overrides `Compile / console` and `Compile / consoleQuick` when `enablePlugins(ScraiPlugin)`
   is set. It does not support sbt console `initialCommands`, `cleanupCommands`,
   or arbitrary console-specific compiler options yet.
 - The input parser/highlighter is adapted from the official REPL. Completion
   candidates use the compiler, but the stock REPL's extra signature display on
   an exact completion match is not currently reproduced.
-- A child JVM uses the controlling terminal (`/dev/tty` on Unix) and the full project classpath. It
+- A child JVM uses the controlling terminal (`/dev/tty` on Unix) and the task's evaluation classpath. It
   does not share sbt's JVM state. Use a terminal rather than an IDE debug console.
 - Depending on the JDK, Scala and JLine may emit warnings about deprecated or
   restricted JVM APIs.
@@ -247,6 +252,8 @@ python3 scripts/pty_smoke.py                  # PTY smoke via `sbt runtime/conso
 sbt publishAllLocal                           # publish all runtime + plugin variants
 SCRAI_SMOKE_CWD=fixtures/sbt1 SCRAI_SMOKE_TASK=console python3 scripts/pty_smoke.py
 SCRAI_SMOKE_CWD=fixtures/sbt2 SCRAI_SMOKE_TASK=console python3 scripts/pty_smoke.py
+SCRAI_SMOKE_CWD=fixtures/sbt1 SCRAI_SMOKE_TASK=consoleQuick SCRAI_SMOKE_FIXTURE=1 python3 scripts/pty_smoke.py
+SCRAI_SMOKE_CWD=fixtures/sbt2 SCRAI_SMOKE_TASK=consoleQuick SCRAI_SMOKE_FIXTURE=1 python3 scripts/pty_smoke.py
 ```
 
 The CI cross-build runs the runtime unit suite on every supported line:

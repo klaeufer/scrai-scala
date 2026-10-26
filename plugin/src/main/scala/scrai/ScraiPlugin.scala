@@ -4,7 +4,7 @@ import sbt._
 import sbt.Keys._
 import sbtcompat.PluginCompat._
 
-/** Replaces `Compile / console` with the scrai AI REPL in the consuming build.
+/** Replaces `Compile / console` and `Compile / consoleQuick` with the scrai AI REPL.
  *
  *  Opt in with `enablePlugins(ScraiPlugin)`. The matching `scrai-runtime`
  *  artifact is resolved for the build's Scala line and launched on a child
@@ -31,37 +31,43 @@ object ScraiPlugin extends AutoPlugin {
     else None
 
   private val supportedHint =
-    "scrai supports Scala 3.3.x through 3.10.x projects; set scalaVersion to one of those to use `console`."
+    "scrai supports Scala 3.3.x through 3.10.x projects; set scalaVersion to one of those to use `console` or `consoleQuick`."
+
+  private def launch(projectCp: Seq[File], toolCp: Seq[File], directory: File): Unit = {
+    val evalCp = projectCp.map(_.getAbsolutePath).mkString(java.io.File.pathSeparator)
+    val fullCp = (projectCp ++ toolCp).map(_.getAbsolutePath).mkString(java.io.File.pathSeparator)
+    val javaExecutable = file(sys.props("java.home")) / "bin" / "java"
+    // sbt can redirect stdin, so use the controlling terminal explicitly on Unix.
+    val process = new ProcessBuilder(
+      javaExecutable.getAbsolutePath,
+      "--enable-native-access=ALL-UNNAMED",
+      "-cp",
+      fullCp,
+      "-Dscrai.repl.classpath=" + evalCp,
+      "edu.luc.cs.scrai.Main"
+    ).directory(directory).inheritIO()
+    if (!sys.props("os.name").toLowerCase.contains("windows")) {
+      val tty = file("/dev/tty")
+      process.redirectInput(tty).redirectOutput(tty).redirectError(tty)
+    }
+    val code = process.start().waitFor()
+    if (code != 0) sys.error("scrai REPL exited with status " + code)
+  }
 
   override def projectSettings: Seq[Setting[_]] = Seq(
     libraryDependencies ++= runtimeModule(scalaVersion.value).toSeq.map { name =>
       "edu.luc.cs" % name % BuildInfo.version % Scrai.name
     },
     Compile / console := Def.uncached {
-      val module = runtimeModule(scalaVersion.value).getOrElse(sys.error(supportedHint))
+      runtimeModule(scalaVersion.value).getOrElse(sys.error(supportedHint))
       val toolCp = update.value.select(configurationFilter(Scrai.name))
-      val projectCp = Compat.projectPaths.value
-      val evalCp = projectCp.map(_.getAbsolutePath).mkString(java.io.File.pathSeparator)
-      val fullCp = (projectCp ++ toolCp).map(_.getAbsolutePath).mkString(java.io.File.pathSeparator)
-      val javaExecutable = file(sys.props("java.home")) / "bin" / "java"
-      // A real inherited TTY is essential: sbt's Fork helper pipes stdin.
-      // sbt's own launcher can also redirect its stdin, so use the controlling
-      // terminal explicitly on Unix instead of inheriting that redirected fd.
-      val process = new ProcessBuilder(
-        javaExecutable.getAbsolutePath,
-        "--enable-native-access=ALL-UNNAMED",
-        "-cp",
-        fullCp,
-        "-Dscrai.repl.classpath=" + evalCp,
-        "edu.luc.cs.scrai.Main"
-      ).directory(baseDirectory.value).inheritIO()
-      if (!sys.props("os.name").toLowerCase.contains("windows")) {
-        val tty = file("/dev/tty")
-        process.redirectInput(tty).redirectOutput(tty).redirectError(tty)
-      }
-      val code = process.start().waitFor()
-      if (code != 0) sys.error("scrai REPL exited with status " + code)
-      ()
+      launch(Compat.projectPaths.value, toolCp, baseDirectory.value)
+    },
+    Compile / consoleQuick := Def.uncached {
+      runtimeModule(scalaVersion.value).getOrElse(sys.error(supportedHint))
+      val toolCp = update.value.select(configurationFilter(Scrai.name))
+      // Keep this task independent of fullClasspath, which compiles project sources.
+      launch(Compat.quickProjectPaths.value, toolCp, baseDirectory.value)
     }
   )
 }

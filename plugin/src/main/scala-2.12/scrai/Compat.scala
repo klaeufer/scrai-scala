@@ -9,4 +9,9 @@ private[scrai] object Compat {
   val projectPaths = Def.task {
     (Compile / fullClasspath).value.files
   }
+
+  /** External dependencies only: do not compile or include the project's classes. */
+  val quickProjectPaths = Def.task {
+    (Compile / externalDependencyClasspath).value.files
+  }
 }

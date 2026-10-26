@@ -7,6 +7,8 @@ Environment overrides:
   SCRAI_SMOKE_TASK  sbt task to run (default: runtime/console)
   SCRAI_SMOKE_CWD   directory for the sbt invocation (default: current dir)
   SCRAI_SMOKE_EXECUTABLE  executable to run instead of sbt
+  SCRAI_SMOKE_FIXTURE  set to 1 to check fixture classpaths; consoleQuick also
+                       precompiles Demo, then installs a failing compile task
 """
 
 import errno
@@ -57,6 +59,8 @@ def main():
     threading.Thread(target=server.serve_forever, daemon=True).start()
     task = os.environ.get("SCRAI_SMOKE_TASK", "runtime/console")
     cwd = os.environ.get("SCRAI_SMOKE_CWD") or None
+    fixture = os.environ.get("SCRAI_SMOKE_FIXTURE") == "1"
+    quick = task.split("/")[-1].strip() == "consoleQuick"
     with tempfile.TemporaryDirectory(prefix="scrai-smoke-") as tmp:
         config = Path(tmp) / "scrai.ini"
         config.write_text(f"[scrai]\nbase_url = http://127.0.0.1:{server.server_port}/v1\n")
@@ -70,7 +74,16 @@ def main():
             if executable:
                 os.execv(executable, [executable])
             else:
-                os.execvp("sbt", ["sbt", "-batch", task])
+                commands = []
+                if fixture and quick:
+                    # Leave stale classes on disk, then make accidental compilation fatal.
+                    commands = [
+                        "compile",
+                        'set { import sbtcompat.PluginCompat._; Compile / compile := '
+                        'Def.uncached { sys.error("consoleQuick must not compile") } }',
+                    ]
+                # sbt 2's background server does not retain this controlling PTY.
+                os.execvp("sbt", ["sbt", "--server", "-batch", ";".join([*commands, task])])
         transcript = bytearray()
 
         def read_until(needle, start=0, timeout=90):
@@ -96,6 +109,15 @@ def main():
 
         try:
             read_until(b"scala>")
+            if fixture:
+                start = len(transcript)
+                send(b'println("dependency=" + ujson.read("42").num.toInt)\r')
+                read_until(b"dependency=42", start)
+                read_until(b"scala>", start)
+                start = len(transcript)
+                send(b'println("project=" + Demo.hello)\r')
+                read_until(b"Not found: Demo" if quick else b"project=world", start)
+                read_until(b"scala>", start)
             start = len(transcript)
             send(b"val words = List(\"pear\", \"apple\")\r")
             read_until(b'List("pear", "apple")', start)
@@ -151,7 +173,7 @@ def main():
                 result, status = os.waitpid(pid, os.WNOHANG)
                 if result:
                     assert os.waitstatus_to_exitcode(status) == 0, status
-                    mode = "packaged executable" if os.environ.get("SCRAI_SMOKE_EXECUTABLE") else "sbt console"
+                    mode = "packaged executable" if os.environ.get("SCRAI_SMOKE_EXECUTABLE") else f"sbt {task}"
                     print(f"PASS: {mode}, evaluation, context, hotkey, multiline insertion without execution, restore, explicit execution, clear, HTTP failure, cancellation, completion, reset, quit")
                     return
                 if select.select([fd], [], [], 0.2)[0]:
