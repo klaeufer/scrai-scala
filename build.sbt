@@ -23,7 +23,7 @@ ThisBuild / publishMavenStyle := true
 ThisBuild / publishTo := localStaging.value
 
 // Supported lines. Keep runtime module names in sync with ScraiPlugin.runtimeModule.
-val scala33 = "3.3.7"
+val scala33 = "3.3.8"
 val scala34 = "3.4.3"
 val scala35 = "3.5.2"
 val scala36 = "3.6.4"
