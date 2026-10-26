@@ -129,7 +129,7 @@ lazy val runtime = project.in(file("runtime"))
       val sv = scalaVersion.value
       Seq(
         "org.scala-lang" %% "scala3-compiler" % sv,
-        "com.lihaoyi" %% "ujson" % "3.3.1",
+        "com.lihaoyi" %% "ujson" % "4.4.3",
         "org.scalameta" %% "munit" % "1.0.4" % Test
       ) ++ (if (sv.startsWith("3.3.") || sv.startsWith("3.4.") ||
              sv.startsWith("3.5.") || sv.startsWith("3.6.") ||
