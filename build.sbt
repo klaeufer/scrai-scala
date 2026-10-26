@@ -130,7 +130,7 @@ lazy val runtime = project.in(file("runtime"))
       Seq(
         "org.scala-lang" %% "scala3-compiler" % sv,
         "com.lihaoyi" %% "ujson" % "3.3.1",
-        "org.scalameta" %% "munit" % "1.0.4" % Test
+        "org.scalameta" %% "munit" % "1.3.6" % Test
       ) ++ (if (sv.startsWith("3.3.") || sv.startsWith("3.4.") ||
              sv.startsWith("3.5.") || sv.startsWith("3.6.") ||
              sv.startsWith("3.7.")) Seq.empty
