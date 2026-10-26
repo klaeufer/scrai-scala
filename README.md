@@ -84,10 +84,22 @@ lazy val root = project.in(file(".")).enablePlugins(ScraiPlugin)
 `sbt console` now starts the AI REPL, with your project's classpath available
 for evaluation exactly as in the stock REPL.
 
-`sbt consoleQuick` starts the same AI REPL with external dependencies only,
-without compiling the current project's sources or including its compiled
-classes (even if they already exist). Like stock sbt, source dependencies may
-still require compilation.
+Both `console` and `consoleQuick` are enabled in **Compile**, **Runtime**, and **Test**. Each uses its own configuration classpath, including runtime-only or test-only dependencies where appropriate.
+
+`consoleQuick` excludes the current configuration's compiled classes and does not compile its sources. Dependencies on other source configurations or projects may still compile (for example, `Test / consoleQuick` may compile main sources).
+
+Custom configurations can opt in after installing their standard tasks:
+
+```scala
+lazy val Extra = config("extra") extend Test
+lazy val root = project
+  .configs(Extra)
+  .enablePlugins(ScraiPlugin)
+  .settings(inConfig(Extra)(Defaults.testSettings))
+  .settings(inConfig(Extra)(ScraiPlugin.consoleSettings))
+```
+
+Run `sbt "Extra / console"` or `sbt "Extra / consoleQuick"`. Configurations used only for dependency resolution do not automatically gain consoles.
 
 ### Preparing and publishing a Maven Central release
 
@@ -228,7 +240,7 @@ inference and does not automatically fall back to another model/provider.
   execute it. There is no sandbox, automatic evaluation, or automatic repair.
 - HTTPS is required except for local servers. API keys are read from environment
   variables; provider error bodies are not printed.
-- The sbt plugin overrides `Compile / console` and `Compile / consoleQuick` when `enablePlugins(ScraiPlugin)`
+- The sbt plugin overrides `console` and `consoleQuick` in `Compile`, `Runtime`, and `Test` when `enablePlugins(ScraiPlugin)`
   is set. It does not support sbt console `initialCommands`, `cleanupCommands`,
   or arbitrary console-specific compiler options yet.
 - The input parser/highlighter is adapted from the official REPL. Completion

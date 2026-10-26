@@ -7,8 +7,9 @@ Environment overrides:
   SCRAI_SMOKE_TASK  sbt task to run (default: runtime/console)
   SCRAI_SMOKE_CWD   directory for the sbt invocation (default: current dir)
   SCRAI_SMOKE_EXECUTABLE  executable to run instead of sbt
+  SCRAI_SMOKE_CONFIG configuration for fixture checks (default: Compile)
   SCRAI_SMOKE_FIXTURE  set to 1 to check fixture classpaths; consoleQuick also
-                       precompiles Demo, then installs a failing compile task
+                       precompiles the selected configuration, then installs a failing compile task
 """
 
 import errno
@@ -60,6 +61,7 @@ def main():
     task = os.environ.get("SCRAI_SMOKE_TASK", "runtime/console")
     cwd = os.environ.get("SCRAI_SMOKE_CWD") or None
     fixture = os.environ.get("SCRAI_SMOKE_FIXTURE") == "1"
+    scope = os.environ.get('SCRAI_SMOKE_CONFIG', 'Compile')
     quick = task.split("/")[-1].strip() == "consoleQuick"
     with tempfile.TemporaryDirectory(prefix="scrai-smoke-") as tmp:
         config = Path(tmp) / "scrai.ini"
@@ -78,12 +80,12 @@ def main():
                 if fixture and quick:
                     # Leave stale classes on disk, then make accidental compilation fatal.
                     commands = [
-                        "compile",
-                        'set { import sbtcompat.PluginCompat._; Compile / compile := '
+                        ('Compile' if scope == 'Runtime' else scope) + ' / compile',
+                        'set { import sbtcompat.PluginCompat._; val Selected = config("SCOPE"); Selected / compile := '
                         'Def.uncached { sys.error("consoleQuick must not compile") } }',
                     ]
                 # sbt 2's background server does not retain this controlling PTY.
-                os.execvp("sbt", ["sbt", "--server", "-batch", ";".join([*commands, task])])
+                os.execvp("sbt", ["sbt", "--server", "-batch", ";".join([*commands, task]).replace('SCOPE', scope.lower())])
         transcript = bytearray()
 
         def read_until(needle, start=0, timeout=90):
@@ -110,14 +112,16 @@ def main():
         try:
             read_until(b"scala>")
             if fixture:
-                start = len(transcript)
-                send(b'println("dependency=" + ujson.read("42").num.toInt)\r')
-                read_until(b"dependency=42", start)
-                read_until(b"scala>", start)
-                start = len(transcript)
-                send(b'println("project=" + Demo.hello)\r')
-                read_until(b"Not found: Demo" if quick else b"project=world", start)
-                read_until(b"scala>", start)
+                def check(expression, expected):
+                    start = len(transcript)
+                    send(expression.encode() + bytes([13]))
+                    read_until(expected.encode(), start)
+                    read_until(b'scala>', start)
+                check('ujson.read(42.toString).num.toInt', 'Not found: ujson' if scope == 'Compile' else 'Int = 42')
+                check('classOf[munit.FunSuite].getName', 'String = ' if scope in ('Test', 'Extra') else 'Not found: munit')
+                check('Demo.hello.length', 'Not found: Demo' if quick else 'Int = 5')
+                check('TestDemo.hello.length', 'Int = 4' if scope in ('Test', 'Extra') and not quick else 'Not found: TestDemo')
+                check('ExtraDemo.hello.length', 'Int = 5' if scope == 'Extra' and not quick else 'Not found: ExtraDemo')
             start = len(transcript)
             send(b"val words = List(\"pear\", \"apple\")\r")
             read_until(b'List("pear", "apple")', start)

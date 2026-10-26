@@ -346,9 +346,9 @@ validation instead of trusting the unit tests alone. The verifier in
 `/tmp/scrai-fx1.log` shows it verbatim:
 
 ```
-[error] sbt.librarymanagement.ResolveException: Error downloading scrai-runtime_3.9:0.1.0-SNAPSHOT:scrai
+[error] sbt.librarymanagement.ResolveException: Error downloading scrai-runtime_3.9:0.1.5-SNAPSHOT:scrai
 [error]   Not found
-[error]   not found: /Users/laufer/.ivy2/local/scrai-runtime_3.9/0.1.0-SNAPSHOT/scrai/ivys/ivy.xml
+[error]   not found: /Users/laufer/.ivy2/local/scrai-runtime_3.9/0.1.5-SNAPSHOT/scrai/ivys/ivy.xml
 ```
 
 Note the trailing `:scrai` in the coordinates — that is the empty artifact
@@ -366,7 +366,7 @@ fixtures/sbt1/            fixtures/sbt2/
   project/build.properties    project/build.properties
     sbt.version=1.13.0           sbt.version=2.0.11
   project/plugins.sbt        project/plugins.sbt
-    addSbtPlugin("edu.luc.cs" % "sbt-console-ai" % "0.1.3-SNAPSHOT")
+    addSbtPlugin("edu.luc.cs" % "sbt-console-ai" % "0.1.5-SNAPSHOT")
   build.sbt                   build.sbt
     .enablePlugins(ScraiPlugin)   .enablePlugins(ScraiPlugin)
   src/main/scala/Demo.scala  src/main/scala/Demo.scala
@@ -419,10 +419,10 @@ once per sbt line. The resulting local coordinates are:
 
 | Artifact | Coordinates |
 |---|---|
-| runtime, Scala 3.9 | `edu.luc.cs:scrai-runtime_3.9:0.1.3-SNAPSHOT` |
-| runtime, Scala 3.3 | `edu.luc.cs:scrai-runtime_3.3:0.1.3-SNAPSHOT` |
-| plugin, sbt 1 | `edu.luc.cs:sbt-console-ai_2.12_1.0:0.1.3-SNAPSHOT` |
-| plugin, sbt 2 | `edu.luc.cs:sbt-console-ai_sbt2_3:0.1.3-SNAPSHOT` |
+| runtime, Scala 3.9 | `edu.luc.cs:scrai-runtime_3.9:0.1.5-SNAPSHOT` |
+| runtime, Scala 3.3 | `edu.luc.cs:scrai-runtime_3.3:0.1.5-SNAPSHOT` |
+| plugin, sbt 1 | `edu.luc.cs:sbt-console-ai_2.12_1.0:0.1.5-SNAPSHOT` |
+| plugin, sbt 2 | `edu.luc.cs:sbt-console-ai_sbt2_3:0.1.5-SNAPSHOT` |
 
 The README originally said `sbt publishLocal`, which publishes only the
 *default* variant of each module — one runtime and one plugin — and would

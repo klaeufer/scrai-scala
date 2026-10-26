@@ -4,7 +4,7 @@ import sbt._
 import sbt.Keys._
 import sbtcompat.PluginCompat._
 
-/** Replaces `Compile / console` and `Compile / consoleQuick` with the scrai AI REPL.
+/** Replaces `console` and `consoleQuick` in Compile, Runtime, and Test with the scrai AI REPL.
  *
  *  Opt in with `enablePlugins(ScraiPlugin)`. The matching `scrai-runtime`
  *  artifact is resolved for the build's Scala line and launched on a child

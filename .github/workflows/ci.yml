@@ -163,13 +163,19 @@ jobs:
           SCRAI_SMOKE_CWD: fixtures/${{ matrix.fixture }}
           SCRAI_TEST_SCALA_VERSION: ${{ matrix.scala }}
           SCRAI_SMOKE_FIXTURE: "1"
-        run: SCRAI_SMOKE_TASK=console python3 scripts/pty_smoke.py
+        run: |
+          for scope in Compile Runtime Test Extra; do
+            SCRAI_SMOKE_CONFIG=$scope SCRAI_SMOKE_TASK=$scope/console python3 scripts/pty_smoke.py
+          done
       - name: Verify consoleQuick AI support, dependencies, and no compilation
         env:
           SCRAI_SMOKE_CWD: fixtures/${{ matrix.fixture }}
           SCRAI_TEST_SCALA_VERSION: ${{ matrix.scala }}
           SCRAI_SMOKE_FIXTURE: "1"
-        run: SCRAI_SMOKE_TASK=consoleQuick python3 scripts/pty_smoke.py
+        run: |
+          for scope in Compile Runtime Test Extra; do
+            SCRAI_SMOKE_CONFIG=$scope SCRAI_SMOKE_TASK=$scope/consoleQuick python3 scripts/pty_smoke.py
+          done
       - name: Upload terminal transcript
         if: always()
         uses: actions/upload-artifact@v6
