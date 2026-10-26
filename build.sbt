@@ -3,7 +3,7 @@ import scala.sys.process.*
 ThisBuild / organization := "edu.luc.cs"
 ThisBuild / version := sys.props.get("scrai.version")
   .orElse(sys.props.get("version"))
-  .getOrElse("0.1.4-SNAPSHOT")
+  .getOrElse("0.1.5-SNAPSHOT")
 ThisBuild / organizationName := "Loyola University Chicago"
 ThisBuild / organizationHomepage := Some(url("https://www.luc.edu/"))
 ThisBuild / homepage := Some(url("https://github.com/klaeufer/scrai-scala"))

@@ -54,20 +54,25 @@ object ScraiPlugin extends AutoPlugin {
     if (code != 0) sys.error("scrai REPL exited with status " + code)
   }
 
-  override def projectSettings: Seq[Setting[_]] = Seq(
-    libraryDependencies ++= runtimeModule(scalaVersion.value).toSeq.map { name =>
-      "edu.luc.cs" % name % BuildInfo.version % Scrai.name
-    },
-    Compile / console := Def.uncached {
+  /** Reusable console tasks for inConfig(MyConfig)(ScraiPlugin.consoleSettings). */
+  def consoleSettings: Seq[Setting[_]] = Seq(
+    console := Def.uncached {
       runtimeModule(scalaVersion.value).getOrElse(sys.error(supportedHint))
       val toolCp = update.value.select(configurationFilter(Scrai.name))
       launch(Compat.projectPaths.value, toolCp, baseDirectory.value)
     },
-    Compile / consoleQuick := Def.uncached {
+    consoleQuick := Def.uncached {
       runtimeModule(scalaVersion.value).getOrElse(sys.error(supportedHint))
       val toolCp = update.value.select(configurationFilter(Scrai.name))
       // Keep this task independent of fullClasspath, which compiles project sources.
       launch(Compat.quickProjectPaths.value, toolCp, baseDirectory.value)
     }
   )
+
+  override def projectSettings: Seq[Setting[_]] = Seq(
+    libraryDependencies ++= runtimeModule(scalaVersion.value).toSeq.map { name =>
+      "edu.luc.cs" % name % BuildInfo.version % Scrai.name
+    }
+  ) ++ inConfig(Compile)(consoleSettings) ++
+    inConfig(Runtime)(consoleSettings) ++ inConfig(Test)(consoleSettings)
 }
