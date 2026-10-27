@@ -136,7 +136,7 @@ staged bundle:
 sbt -Dscrai.version=0.1.3 sonaUpload
 ```
 
-Review the deployment in Central Publisher Portal. After server-side validation
+Review the [deployment](https://central.sonatype.com/publishing/deployments) in Central Publisher Portal. After server-side validation
 succeeds, publish it there and wait until its status is `PUBLISHED`. Verify that
 the release resolves from Maven Central before announcing it to consumers.
 
