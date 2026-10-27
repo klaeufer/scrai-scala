@@ -70,7 +70,7 @@ rm -rf $HOME/.local/bin/scrai $HOME/.local/share/scrai $HOME/.scrai_history
 Add the published plugin to `project/plugins.sbt`:
 
 ```scala
-addSbtPlugin("edu.luc.cs" % "sbt-console-ai" % "0.1.3")
+addSbtPlugin("edu.luc.cs" % "sbt-console-ai" % "0.1.4")
 ```
 
 Then enable it in `build.sbt`:
@@ -107,12 +107,12 @@ The repository includes `stageAll` and `stageAllSigned` commands to assemble
 the eight Scala runtime variants and both sbt plugin variants in sbt's local
 Central staging directory (`target/sona-staging`). These commands do not upload
 anything. Choose a release version that is not already published, then stage
-and validate the artifacts (replace `0.1.3` with the intended release version
+and validate the artifacts (replace `0.1.4` with the intended release version
 as appropriate):
 
 ```sh
-sbt -Dscrai.version=0.1.3 stageAll
-python3 scripts/validate_maven_staging.py --version 0.1.3
+sbt -Dscrai.version=0.1.4 stageAll
+python3 scripts/validate_maven_staging.py --version 0.1.4
 ```
 
 The validator checks the expected coordinates, version, POM metadata, and
@@ -123,8 +123,8 @@ After installing GnuPG and configuring a signing key with a publicly available
 key, stage signatures and validate their presence with:
 
 ```sh
-sbt -Dscrai.version=0.1.3 stageAllSigned
-python3 scripts/validate_maven_staging.py --version 0.1.3 --signed
+sbt -Dscrai.version=0.1.4 stageAllSigned
+python3 scripts/validate_maven_staging.py --version 0.1.4 --signed
 ```
 
 The local GPG agent may prompt for the key passphrase. Neither staging command
@@ -133,7 +133,7 @@ credentials as `SONATYPE_USERNAME` and `SONATYPE_PASSWORD`, then upload the
 staged bundle:
 
 ```sh
-sbt -Dscrai.version=0.1.3 sonaUpload
+sbt -Dscrai.version=0.1.4 sonaUpload
 ```
 
 Review the [deployment](https://central.sonatype.com/publishing/deployments) in Central Publisher Portal. After server-side validation
@@ -147,8 +147,8 @@ source (including updated release documentation), and ensure CI passes. Create
 an annotated version tag at that commit and push it:
 
 ```sh
-git tag -a v0.1.3 -m "Release 0.1.3"
-git push origin v0.1.3
+git tag -a v0.1.4 -m "Release 0.1.4"
+git push origin v0.1.4
 ```
 
 Pushing a `v*.*.*` tag triggers the GitHub Actions release workflow. It builds
